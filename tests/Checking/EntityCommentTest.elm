@@ -1,6 +1,6 @@
 module Checking.EntityCommentTest exposing (checkEntityCommentTest)
 
-import Constraints
+import Check
 import Elm.Parser
 import Elm.Processing
 import Elm.Syntax.File
@@ -10,6 +10,7 @@ import Intermediate
 import Models
 import Test
 import TestUtil
+import Violations
 
 
 checkEntityCommentTest : Test.Test
@@ -19,7 +20,13 @@ checkEntityCommentTest =
             case TestUtil.stringToIntermediate modString of
                 Just m ->
                     m.entities
-                        |> List.map (\ent -> Constraints.getViolationsEntity ent checkAll ignored)
+                        |> List.map
+                            (\ent ->
+                                Violations.entity
+                                    ent
+                                    checkAll
+                                    ignored
+                            )
                         |> List.concat
                         |> Expect.equalLists expected
 
@@ -30,8 +37,8 @@ checkEntityCommentTest =
         [ Test.test "Module with no comment on exposed function." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment
-                    , Constraints.NotAnnotatedArgument "anInt"
+                    [ Check.NoEntityComment
+                    , Check.NotAnnotatedArgument "anInt"
                     ]
                     exposedUncommentedFunction
                     []
@@ -39,9 +46,9 @@ checkEntityCommentTest =
         , Test.test "Module with no comment on exposed record." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment
-                    , Constraints.NotAnnotatedArgument "aField"
-                    , Constraints.NotAnnotatedArgument "anotherField"
+                    [ Check.NoEntityComment
+                    , Check.NotAnnotatedArgument "aField"
+                    , Check.NotAnnotatedArgument "anotherField"
                     ]
                     exposedUncommentedRecord
                     []
@@ -49,23 +56,27 @@ checkEntityCommentTest =
         , Test.test "Module with no comment on exposed type def." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment ]
+                    [ Check.NoEntityComment ]
                     exposedUncommentedTypeDef
                     []
                     True
         , Test.test "Module with no comment on exposed type alias." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment ]
+                    [ Check.NoEntityComment ]
                     exposedUncommentedTypeAlias
                     []
                     False
-        , Test.describe "Unexposed declarations with no documentation and checkAll=false."
+        , Test.describe
+            "Unexposed declarations with no documentation and checkAll=false."
             (List.indexedMap
                 (\idx ->
                     \moduleStr ->
                         Test.test
-                            ("Unexposed declarations with no documentation and checkAll=false " ++ toString idx)
+                            ("Unexposed declarations with no documentation"
+                                ++ "and checkAll=false "
+                                ++ toString idx
+                            )
                         <|
                             \() ->
                                 checkExpectation
@@ -80,47 +91,55 @@ checkEntityCommentTest =
                 , unexposedUncommentedTypeAlias
                 ]
             )
-        , Test.test "Module with no comment on unexposed function, and checkAll = true." <|
+        , Test.test
+            "Module with no comment on unexposed function, and checkAll = true."
+          <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment
-                    , Constraints.NotAnnotatedArgument "anInt"
+                    [ Check.NoEntityComment
+                    , Check.NotAnnotatedArgument "anInt"
                     ]
                     unexposedUncommentedFunction
                     []
                     True
-        , Test.test "Module with no comment on unexposed record, and checkAll = true." <|
+        , Test.test
+            "Module with no comment on unexposed record, and checkAll = true."
+          <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment
-                    , Constraints.NotAnnotatedArgument "aField"
-                    , Constraints.NotAnnotatedArgument "anotherField"
+                    [ Check.NoEntityComment
+                    , Check.NotAnnotatedArgument "aField"
+                    , Check.NotAnnotatedArgument "anotherField"
                     ]
                     unexposedUncommentedRecord
                     []
                     True
-        , Test.test "Module with no comment on unexposed type def, and checkAll = true." <|
+        , Test.test
+            "Module with no comment on unexposed type def, and checkAll = true."
+          <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment ]
+                    [ Check.NoEntityComment ]
                     exposedUncommentedTypeDef
                     []
                     True
-        , Test.test "Module with no comment on unexposed type alias, and checkAll = true." <|
+        , Test.test
+            "Module with no comment on unexposed type alias, and checkAll = true."
+          <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoEntityComment ]
+                    [ Check.NoEntityComment ]
                     exposedUncommentedTypeAlias
                     []
                     True
         , Test.test "Module with many issues 1." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NotAnnotatedArgument "anInt"
-                    , Constraints.TodoComment
-                    , Constraints.NoStartingVerb
-                    , Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
+                    [ Check.NotAnnotatedArgument "anInt"
+                    , Check.TodoComment
+                    , Check.NoStartingVerb
+                    , Check.NoStartingSpace
+                    , Check.NoEndingPeriod
                     ]
                     largerExample1
                     []
@@ -128,14 +147,14 @@ checkEntityCommentTest =
         , Test.test "Module with many issues 2." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NotAnnotatedArgument "anInt"
-                    , Constraints.NotAnnotatedArgument "anotherInt"
-                    , Constraints.NotAnnotatedArgument "aThirdInt"
-                    , Constraints.TodoComment
-                    , Constraints.NotCapitalized
-                    , Constraints.NoStartingVerb
-                    , Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
+                    [ Check.NotAnnotatedArgument "anInt"
+                    , Check.NotAnnotatedArgument "anotherInt"
+                    , Check.NotAnnotatedArgument "aThirdInt"
+                    , Check.TodoComment
+                    , Check.NotCapitalized
+                    , Check.NoStartingVerb
+                    , Check.NoStartingSpace
+                    , Check.NoEndingPeriod
                     ]
                     largerExample2
                     []
@@ -145,12 +164,12 @@ checkEntityCommentTest =
                 checkExpectation
                     []
                     largerExample2
-                    [ Constraints.NotAnnotatedArgument ""
-                    , Constraints.TodoComment
-                    , Constraints.NotCapitalized
-                    , Constraints.NoStartingVerb
-                    , Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
+                    [ Check.NotAnnotatedArgument ""
+                    , Check.TodoComment
+                    , Check.NotCapitalized
+                    , Check.NoStartingVerb
+                    , Check.NoStartingSpace
+                    , Check.NoEndingPeriod
                     ]
                     True
         ]

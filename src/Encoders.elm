@@ -1,6 +1,8 @@
 module Encoders exposing (encodeIssue)
 
-import Constraints
+{-| Contains the functions for encoding an Issue to JSON.
+-}
+
 import Elm.Syntax.Range
 import Issue
 import Json.Encode
@@ -17,10 +19,12 @@ encodeIssue issue =
             Issue.unwrap issue
 
         violationsStr =
-            List.map Constraints.violationToMessage violated
+            List.map Messages.checkToString violated
     in
     Json.Encode.object
-        [ ( "violations", Json.Encode.list <| List.map Json.Encode.string <| violationsStr )
+        [ ( "violations"
+          , Json.Encode.list <| List.map Json.Encode.string <| violationsStr
+          )
         , ( "trigger", encodeTrigger trigger )
         ]
 
@@ -45,7 +49,11 @@ encodeTrigger trigger =
         Issue.TopLevel mbcomment ->
             Json.Encode.object
                 [ ( "trigger_type", Json.Encode.string "top-level comment" )
-                , ( "comment", Maybe.withDefault (Json.Encode.string "") <| Maybe.map encodeComment <| mbcomment )
+                , ( "comment"
+                  , Maybe.withDefault (Json.Encode.string "") <|
+                        Maybe.map encodeComment <|
+                            mbcomment
+                  )
                 ]
 
 
@@ -55,7 +63,11 @@ encodeEntity entity =
         [ ( "range", Elm.Syntax.Range.encode <| entity.range )
         , ( "type", Json.Encode.string <| Messages.entityTypeToString <| entity.eType )
         , ( "name", Json.Encode.string <| entity.name )
-        , ( "comment", Maybe.withDefault (Json.Encode.string "") <| Maybe.map encodeComment <| entity.comment )
+        , ( "comment"
+          , Maybe.withDefault (Json.Encode.string "") <|
+                Maybe.map encodeComment <|
+                    entity.comment
+          )
         , ( "exposed", Json.Encode.bool <| entity.exposed )
         ]
 

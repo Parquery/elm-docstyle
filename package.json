@@ -11,10 +11,11 @@
   },
   "scripts": {
     "run": "node dist/bin/index.js",
-    "prepare": "npm run format && npm run analyse && npm run test",
+    "prepare": "npm run format && npm run analyse && npm run docstyle && npm run test",
     "build": "elm-make src/Main.elm  --output dist/checker.js",
     "format": "elm-format --elm-version=0.18 src/ tests/ --yes ",
     "analyse": "elm-analyse && elm-analyse tests/",
+    "docstyle": "elm-docstyle src/ tests/ --config_path elm-docstyle.json",
     "test": "elm-test"
   },
   "repository": {

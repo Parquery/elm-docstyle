@@ -1,6 +1,9 @@
 module Checking.TopLevelCommentTest exposing (checkTopLevelCommentTest)
 
-import Constraints
+{-| Tests the correct parsing of top-level comments.
+-}
+
+import Check
 import Elm.Parser
 import Elm.Processing
 import Elm.Syntax.File
@@ -10,6 +13,7 @@ import Intermediate
 import Models
 import Test
 import TestUtil
+import Violations
 
 
 checkTopLevelCommentTest : Test.Test
@@ -18,7 +22,9 @@ checkTopLevelCommentTest =
         checkExpectation expected modString ignored =
             case TestUtil.stringToIntermediate modString of
                 Just m ->
-                    Constraints.getViolationsTopLevel m.topLevelComment ignored
+                    Violations.topLevel
+                        m.topLevelComment
+                        ignored
                         |> Expect.equalLists expected
 
                 Nothing ->
@@ -27,28 +33,52 @@ checkTopLevelCommentTest =
     Test.describe "Test the checker on the top-level documentation comment."
         [ Test.test "No documentation comment." <|
             \() ->
-                checkExpectation [ Constraints.NoTopLevelComment ] emptyModuleWithoutDoc []
+                checkExpectation
+                    [ Check.NoTopLevelComment ]
+                    emptyModuleWithoutDoc
+                    []
         , Test.test "No documentation comment but NoTopLevelComment error ignored." <|
             \() ->
-                checkExpectation [] emptyModuleWithoutDoc [ Constraints.NoTopLevelComment ]
+                checkExpectation
+                    []
+                    emptyModuleWithoutDoc
+                    [ Check.NoTopLevelComment ]
         , Test.test "t.o.d.o in documentation." <|
             \() ->
-                checkExpectation [ Constraints.TodoComment ] moduleWithDocTodo []
+                checkExpectation
+                    [ Check.TodoComment ]
+                    moduleWithDocTodo
+                    []
         , Test.test "f.i.x.m.e in documentation." <|
             \() ->
-                checkExpectation [ Constraints.TodoComment ] moduleWithDocFixme []
+                checkExpectation
+                    [ Check.TodoComment ]
+                    moduleWithDocFixme
+                    []
         , Test.test "no starting space in documentation." <|
             \() ->
-                checkExpectation [ Constraints.NoStartingSpace ] moduleWithOutStartingSpace []
+                checkExpectation
+                    [ Check.NoStartingSpace ]
+                    moduleWithOutStartingSpace
+                    []
         , Test.test "Correct documentation comment." <|
             \() ->
-                checkExpectation [] emptyModuleWithDoc []
+                checkExpectation
+                    []
+                    emptyModuleWithDoc
+                    []
         , Test.test "Several errors." <|
             \() ->
-                checkExpectation [ Constraints.NoStartingSpace, Constraints.TodoComment ] moduleWithErrorsInDoc []
+                checkExpectation
+                    [ Check.NoStartingSpace, Check.TodoComment ]
+                    moduleWithErrorsInDoc
+                    []
         , Test.test "Several errors, all ignored." <|
             \() ->
-                checkExpectation [] moduleWithErrorsInDoc [ Constraints.NoStartingSpace, Constraints.TodoComment ]
+                checkExpectation
+                    []
+                    moduleWithErrorsInDoc
+                    [ Check.NoStartingSpace, Check.TodoComment ]
         ]
 
 

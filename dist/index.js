@@ -8,15 +8,15 @@ const path = require('path');
 const helpStr =
     `Usages:
 $ elm-docstyle [elm_code_directory | path_to_elm_file]
-# Docstyle the project and log messages to the console.
 
 Options:
     --help, -h          Print the help output.
     --version, -v       Print the package version.
     --verbose           If set, the offending comments are added to the error report in full.
-    --check_all         If set, the checker goes through all declarations; otherwise, only through exported ones.
+    --check_all         If set, all the function declarations are checked (including the non-exported ones).
+                        Otherwise, only the exported function declarations are checked.
     --config_path       Path to the elm-docstyle JSON config. If unspecified, a default config is used.
-    --format            Output format for CLI. Defaults to "human". Options "human"|"json".`;
+    --format            Output format ("human" or "json"). The default is "human".`;
 
 
 const args = minimist(process.argv.slice(2), {
@@ -36,8 +36,7 @@ const args = minimist(process.argv.slice(2), {
     }
 
     if (args._.length === 0) {
-        console.log("Please specify at least one directory or path to Elm source file.\n");
-        console.log(helpStr);
+        console.log("Please specify at least one directory or path to Elm source file.\n" + helpStr);
         process.exit(1);
     }
 
@@ -57,14 +56,13 @@ const args = minimist(process.argv.slice(2), {
             const excluded = (JSON.parse(txt)).excludedChecks;
             if (excluded === undefined || (excluded instanceof Array) === false
                 || (excluded.length > 0 && (typeof excluded[0] !== "string"))) {
-                console.log("the provided config path does not contain a valid elm-docstyle configuration.");
-                console.log("Please refer to the README to see how a correct config file is shaped.");
+                console.log("the provided config path does not contain a valid elm-docstyle configuration. " +
+                    "Please refer to the README to see how a correct config file is shaped.");
                 process.exit(1);
             }
             excludedChecks = excluded;
         } catch (err) {
-            console.log("failed to open the input config_path:");
-            console.log(err);
+            console.log("failed to open the input config_path: " + err);
             process.exit(1);
         }
     }
@@ -89,23 +87,27 @@ const args = minimist(process.argv.slice(2), {
                 const txt = fs.readFileSync(pth, 'utf8');
                 checker.ports.incoming.send(txt);
             } catch (err) {
-                console.log("failed to open the input path " + pth + ":");
-                console.log(err);
+                console.log("failed to open the input path " + pth + ": " + err);
                 process.exit(1);
             }
-        } else if (pth.endsWith("/")) {
-            if (pth === "elm-stuff"){
+        } else {
+            if (pth.includes("elm-stuff")) {
                 return
             }
             var paths = [];
             try {
                 paths = fs.readdirSync(pth, 'utf8');
             } catch (err) {
-                console.log("failed to open the input dir " + pth + ":");
-                console.log(err);
-                process.exit(1);
+                if (err.code === "ENOTDIR") {
+                    // is not a directory, return
+                    return
+                } else {
+                    console.log("Error while exploring the path " + pth + ": " + err);
+                    process.exit(1);
+                }
             }
-            paths.map(path => pth + path).forEach(a => exploreAndSend(a));
+
+            paths.map(path => pth + "/" + path).forEach(a => exploreAndSend(a));
         }
     };
 
@@ -114,31 +116,25 @@ const args = minimist(process.argv.slice(2), {
     // in milliseconds
     const timeoutStep = 50;
 
-    function finalCheck(roundNr) {
-        if (roundNr > 60000 / timeoutStep) {
-            console.log("60 seconds have passed and the program did not return. Quitting.");
-            process.exit(1);
-        }
-
+    function finalCheck() {
         if (reportList.length < args._.length) {
-            setTimeout(finalCheck, timeoutStep, roundNr++);
+            setTimeout(finalCheck, timeoutStep);
             return;
         }
         const errorsReport = reportList.filter(err => err.length > 0);
         if (errorsReport.length === 0) {
-            console.log("No issues found! :)");
+            console.log("No docstyle issues found! :)");
             process.exit(0);
         } else {
             console.log("Docstyle errors found in " + errorsReport.length + " modules:\n\n");
             errorsReport.sort().forEach(
                 function (report) {
-                    console.log(report);
-                    console.log();
+                    console.log(report + '\n');
                 }
             );
             process.exit(1);
         }
     }
 
-    finalCheck(0);
+    finalCheck();
 })();

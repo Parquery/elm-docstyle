@@ -15,7 +15,10 @@ parseTopLevelCommentTest : Test.Test
 parseTopLevelCommentTest =
     let
         expectedDocs =
-            Just ( TestUtil.range 2 0 3 2, "{-| This module is empty. One day, though...\n-}" )
+            Just
+                ( TestUtil.range 2 0 3 2
+                , "{-| This module is empty. One day, though...\n-}"
+                )
 
         checkExpectation expected modString =
             case TestUtil.stringToIntermediate modString of
@@ -25,7 +28,7 @@ parseTopLevelCommentTest =
                 Nothing ->
                     Expect.fail "Failed to parse the module!"
     in
-    Test.describe "Test the intermediate representation parsing function for the top level comment."
+    Test.describe "Test the parsing function for the top level comment."
         [ Test.test "Empty module with doc." <|
             \() ->
                 checkExpectation expectedDocs emptyModuleWithDoc
@@ -52,11 +55,16 @@ parseTopLevelCommentTest =
                 checkExpectation Nothing moduleWithDocumentedTypeAndNoDoc
         , Test.test "Module with doc and imports and commented declaration." <|
             \() ->
-                checkExpectation expectedDocs moduleWithDocumentedTypeAndImportsAndDoc
+                checkExpectation expectedDocs
+                    moduleWithDocumentedTypeAndImportsAndDoc
         , Test.test "Larger example." <|
             \() ->
                 checkExpectation
-                    (Just ( TestUtil.range 4 0 5 2, "{-| This module is empty. One day, though...\n-}" ))
+                    (Just
+                        ( TestUtil.range 4 0 5 2
+                        , "{-| This module is empty. One day, though...\n-}"
+                        )
+                    )
                     largerExample
         , Test.test "Doc with wrong comment type 1." <|
             \() ->

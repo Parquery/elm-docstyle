@@ -26,7 +26,11 @@ parseTest =
         [ Test.test "Empty module." <|
             \() ->
                 checkExpectation
-                    { entities = [], moduleName = "SomeName", topLevelComment = Nothing, otherComments = [] }
+                    { entities = []
+                    , moduleName = "SomeName"
+                    , topLevelComment = Nothing
+                    , otherComments = []
+                    }
                     "module SomeName exposing (..)"
         , Test.test "Large example." <|
             \() ->
@@ -36,18 +40,34 @@ parseTest =
                         [ { range = TestUtil.range 15 0 15 28
                           , eType = Models.TypeAlias
                           , name = "SomeType"
-                          , comment = Just ( TestUtil.range 13 0 14 2, "{-| SomeType is a type.\n-}" )
+                          , comment =
+                                Just
+                                    ( TestUtil.range 13 0 14 2
+                                    , "{-| SomeType is a type.\n-}"
+                                    )
                           , exposed = True
                           }
                         , { range = TestUtil.range 19 0 19 23
                           , eType = Models.Function []
                           , name = "buildSomeType"
-                          , comment = Just ( TestUtil.range 17 0 18 2, "{-| buildSomeType builds some type.\n-}" )
+                          , comment =
+                                Just
+                                    ( TestUtil.range 17 0 18 2
+                                    , "{-| buildSomeType builds some type.\n-}"
+                                    )
                           , exposed = True
                           }
                         ]
-                    , topLevelComment = Just ( TestUtil.range 4 0 5 2, "{-| This module is empty. One day, though...\n-}" )
-                    , otherComments = [ ( TestUtil.range 11 0 11 26, "-- just a dangling comment" ) ]
+                    , topLevelComment =
+                        Just
+                            ( TestUtil.range 4 0 5 2
+                            , "{-| This module is empty. One day, though...\n-}"
+                            )
+                    , otherComments =
+                        [ ( TestUtil.range 11 0 11 26
+                          , "-- just a dangling comment"
+                          )
+                        ]
                     }
                     largeExample
         ]

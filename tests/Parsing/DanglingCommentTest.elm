@@ -1,5 +1,8 @@
 module Parsing.DanglingCommentTest exposing (parseDanglingCommentTest)
 
+{-| Tests the correct parsing of dangling comments.
+-}
+
 import Elm.Parser
 import Elm.Processing
 import Elm.Syntax.File
@@ -31,12 +34,14 @@ parseDanglingCommentTest =
                     m.otherComments
                         |> List.head
                         |> Maybe.map (\cmm -> Expect.equal cmm expected)
-                        |> Maybe.withDefault (Expect.fail "No dangling comments parsed.")
+                        |> Maybe.withDefault
+                            (Expect.fail "No dangling comments parsed.")
 
                 Nothing ->
                     Expect.fail "Failed to parse the module!"
     in
-    Test.describe "Test the intermediate representation parsing function for dangling comments."
+    Test.describe
+        "Test the parsing function for dangling comments."
         [ Test.describe "Modules with no dangling comments."
             (List.indexedMap
                 (\idx ->
@@ -57,25 +62,56 @@ parseDanglingCommentTest =
                 , largerExample
                 ]
             )
-        , Test.test "Module with wrong top-level comment 1, which gets parsed as dangling." <|
+        , Test.test "Module with wrong top-level parsed as dangling (1)." <|
             \() ->
                 checkExpectation
-                    (expectedComment 4 0 5 2 "{- This module is empty. One day, though...\n-}")
+                    (expectedComment 4
+                        0
+                        5
+                        2
+                        "{- This module is empty. One day, though...\n-}"
+                    )
                     moduleWithWrongDocsType1
-        , Test.test "Module with wrong top-level comment 2, which gets parsed as dangling." <|
+        , Test.test "Module with wrong top-level parsed as dangling (2)." <|
             \() ->
                 checkExpectation
-                    (expectedComment 4 0 4 43 "-- This module is empty. One day, though...")
+                    (expectedComment 4
+                        0
+                        4
+                        43
+                        "-- This module is empty. One day, though..."
+                    )
                     moduleWithWrongDocsType2
         , Test.test "Module with dangling comment 1." <|
             \() ->
-                checkExpectation (expectedComment 11 0 11 26 "-- just a dangling comment") moduleWithDanglingComment1
+                checkExpectation
+                    (expectedComment 11
+                        0
+                        11
+                        26
+                        "-- just a dangling comment"
+                    )
+                    moduleWithDanglingComment1
         , Test.test "Module with dangling comment 2." <|
             \() ->
-                checkExpectation (expectedComment 11 0 11 29 "{- just a dangling comment -}") moduleWithDanglingComment2
+                checkExpectation
+                    (expectedComment 11
+                        0
+                        11
+                        29
+                        "{- just a dangling comment -}"
+                    )
+                    moduleWithDanglingComment2
         , Test.test "Module with dangling comment 3." <|
             \() ->
-                checkExpectation (expectedComment 11 0 11 30 "{-| just a dangling comment -}") moduleWithDanglingComment3
+                checkExpectation
+                    (expectedComment 11
+                        0
+                        11
+                        30
+                        "{-| just a dangling comment -}"
+                    )
+                    moduleWithDanglingComment3
         ]
 
 

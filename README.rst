@@ -1,12 +1,24 @@
-Elm Docstyle
+Elm-Docstyle
 ============
 A tool that allows you to check the existence and quality of your `Elm <http://elm-lang.org/>`_ code comments.
+
 
 Usage
 =====
 
-Prerequisites
+.. code-block:: bash
 
+    elm-docstyle Main.elm  # Perform the docstyle checks on a single file and print the failed checks
+    elm-docstyle src/  # Analyze all *.elm files in a directory
+    elm-docstyle --format=json src/ # Output the failed checks in JSON
+    elm-docstyle --help  # See other command line options
+
+
+Installation
+============
+
+Prerequisites
+-------------
 
 The following binaries should be available on the path:
 
@@ -17,16 +29,13 @@ The following binaries should be available on the path:
     elm  0.18.x
 
 
-Installation
-============
-
-With ``npm``:
+You can install `elm-docstyle` using `npm`:
 
 .. code-block:: bash
 
     npm install -g elm-docstyle
 
-or if using ``yarn``:
+Alternatively, you can use `yarn`:
 
 
 .. code-block:: bash
@@ -34,8 +43,8 @@ or if using ``yarn``:
     yarn global add elm-docstyle
 
 
-Usage
-=====
+Detailed Instructions
+=====================
 
 ``elm-docstyle [elm_code_directory | path_to_elm_file]``
 
@@ -43,18 +52,21 @@ Options:
     --help, -h          Print the help output.
     --version, -v       Print the package version.
     --verbose           If set, the offending comments are added to the error report in full.
-    --check_all         If set, the checker goes through all declarations; otherwise, only through exported ones.
+    --check_all         If set, all the function declarations are checked (including the non-exported ones).
+                        Otherwise, only the exported function declarations are checked.
     --config_path       Path to the elm-docstyle JSON config. If unspecified, a default config is used.
-    --format            Output format for CLI. Defaults to "human". Options: "human"|"json".
+    --format            Output format ("human" or "json"). The default is "human".
 
-The checker will look recursively for Elm files in all the directories given, excluding the ``elm-stuff``.
+Elm-docstyle will look recursively for Elm files in all the directories given, excluding the ``elm-stuff``.
 
 
 Configuration
 =============
 
 You can specify a configuration as a .json file, which needs to contain the field "excludedChecks" as a list of
-strings. The excluded checks will be fed to the checker and ignored. Example of a elm-docstyle-config.json file:
+strings. The excluded checks will be fed to the checker and ignored.
+
+Example of a elm-docstyle-config.json file:
 
 .. code-block:: JSON
 
@@ -64,13 +76,13 @@ strings. The excluded checks will be fed to the checker and ignored. Example of 
 
 
 
-Refer to the next paragraph to know which checks are supported (and can hence be disabled).
+Refer to the next section to know which checks are supported (and can hence be disabled).
 
 Supported Checks
 ----------------
 
 ==========================  ======================================================================================
-Check name                  Explanation
+Name                        Explanation
 ==========================  ======================================================================================
 ``NotCapitalized``          the first word of the comment should be capitalized.
 ``NoStartingSpace``         the comment should start with a space.
@@ -146,7 +158,8 @@ The code representing and parsing the Elm code relies on the excellent
 `elm-syntax <https://github.com/stil4m/elm-syntax>`_ package.
 
 The overall structure and "flavor" of the package was inspired by
-`elm-format <https://github.com/avh4/elm-format>`_ and `elm-analyse <https://github.com/stil4m/elm-analyse>`_.
+`elm-format <https://github.com/avh4/elm-format>`_ and `elm-analyse <https://github.com/stil4m/elm-analyse>`_,
+which we also rely on for pre-commit checks.
 
 
 

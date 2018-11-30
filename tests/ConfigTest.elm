@@ -1,13 +1,18 @@
 module ConfigTest exposing (configTest)
 
+{-| Tests the configuration functions.
+-}
+
+import Check
 import Configuration
-import Constraints
 import Elm.Syntax.Range exposing (Range)
 import Expect
 import Models exposing (EntityType(..))
 import Test
 
 
+{-| Tests the correct parsing of the configuration from flags.
+-}
 configTest : Test.Test
 configTest =
     Test.describe "Test config parsing."
@@ -55,7 +60,9 @@ configTest =
             \() ->
                 Expect.equal
                     (Err
-                        """Failed to parse the format flag. Expected "", "human" or "json", got: somethingelse"""
+                        ("Failed to parse the format flag. Expected \"\", "
+                            ++ "\"human\" or \"json\", got: somethingelse"
+                        )
                     )
                     (let
                         flags =
@@ -70,14 +77,18 @@ configTest =
         , Test.test "Test that excluded checks are correctly parsed 1." <|
             \() ->
                 Expect.equal
-                    [ Constraints.TodoComment
-                    , Constraints.WrongCommentType
-                    , Constraints.NotAnnotatedArgument ""
+                    [ Check.TodoComment
+                    , Check.WrongCommentType
+                    , Check.NotAnnotatedArgument ""
                     ]
                     (Configuration.fromFlags
                         { format = "human"
                         , verbose = False
-                        , excludedChecks = [ "TodoComment", "WrongCommentType", "NotAnnotatedArgument" ]
+                        , excludedChecks =
+                            [ "TodoComment"
+                            , "WrongCommentType"
+                            , "NotAnnotatedArgument"
+                            ]
                         , checkAllDefinitions = False
                         }
                         |> Result.map .excludedChecks
@@ -86,13 +97,13 @@ configTest =
         , Test.test "Test that excluded checks are correctly parsed 2." <|
             \() ->
                 Expect.equal
-                    [ Constraints.NotCapitalized
-                    , Constraints.NoStartingVerb
-                    , Constraints.NoStartingSpace
-                    , Constraints.NoEntityComment
-                    , Constraints.NoEndingPeriod
-                    , Constraints.NoTopLevelComment
-                    , Constraints.NotExistingArgument ""
+                    [ Check.NotCapitalized
+                    , Check.NoStartingVerb
+                    , Check.NoStartingSpace
+                    , Check.NoEntityComment
+                    , Check.NoEndingPeriod
+                    , Check.NoTopLevelComment
+                    , Check.NotExistingArgument ""
                     ]
                     (Configuration.fromFlags
                         { format = "human"
@@ -114,11 +125,20 @@ configTest =
         , Test.test "Test that non-existing checks throw an error." <|
             \() ->
                 Expect.equal
-                    (Err """Illegal check name(s): "SomeCheck", "SomeOtherCheck".""")
+                    (Err
+                        ("Illegal check name(s): \"SomeCheck\""
+                            ++ ", \"SomeOtherCheck\"."
+                        )
+                    )
                     (Configuration.fromFlags
                         { format = "human"
                         , verbose = False
-                        , excludedChecks = [ "SomeCheck", "SomeOtherCheck", "TodoComment", "WrongCommentType" ]
+                        , excludedChecks =
+                            [ "SomeCheck"
+                            , "SomeOtherCheck"
+                            , "TodoComment"
+                            , "WrongCommentType"
+                            ]
                         , checkAllDefinitions = False
                         }
                     )

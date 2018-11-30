@@ -1,13 +1,22 @@
 module Checker exposing (getIssues, getIssuesJSON, getIssuesString)
 
+{-| Contains the logic for analyzing the parsed module.
+-}
+
 import Configuration
-import Constraints
 import Encoders
 import Issue
 import Json.Encode
 import Models
+import Violations
 
 
+{-| Converts the parsed module to a list of issues.
+
+  - `model` -- the parsed module code.
+  - `config` -- the configuration containing ignored checks and settings.
+
+-}
 getIssues : Models.ParsedModule -> Configuration.Model -> List Issue.Issue
 getIssues parsed config =
     let
@@ -23,20 +32,53 @@ getIssues parsed config =
                 |> Maybe.withDefault 1
 
         topLevelCommentIssues =
-            Constraints.getViolationsTopLevel parsed.topLevelComment ignoredChecks
-                |> (\violated -> Issue.fromViolationsAndTrigger violated (Issue.TopLevel parsed.topLevelComment))
+            Violations.topLevel parsed.topLevelComment ignoredChecks
+                |> (\violated ->
+                        Issue.fromViolationsAndTrigger
+                            violated
+                            (Issue.TopLevel parsed.topLevelComment)
+                   )
                 |> (\issue -> [ ( topLevelLine, issue ) ])
 
         otherCommentsIssues =
             parsed.otherComments
-                |> List.map (\comment -> ( comment, Constraints.getViolationsDangling comment ignoredChecks ))
-                |> List.map (\( comment, violated ) -> ( comment, Issue.fromViolationsAndTrigger violated (Issue.Dangling comment) ))
-                |> List.map (\( ( range, _ ), issue ) -> ( range.start.row, issue ))
+                |> List.map
+                    (\comment ->
+                        ( comment
+                        , Violations.dangling comment ignoredChecks
+                        )
+                    )
+                |> List.map
+                    (\( comment, violated ) ->
+                        ( comment
+                        , Issue.fromViolationsAndTrigger
+                            violated
+                            (Issue.Dangling comment)
+                        )
+                    )
+                |> List.map
+                    (\( ( range, _ ), issue ) ->
+                        ( range.start.row
+                        , issue
+                        )
+                    )
 
         entityIssues =
             parsed.entities
-                |> List.map (\ent -> ( ent, Constraints.getViolationsEntity ent checkAll ignoredChecks ))
-                |> List.map (\( ent, viol ) -> ( ent.range.start.row, Issue.fromViolationsAndTrigger viol (Issue.Entity ent) ))
+                |> List.map
+                    (\ent ->
+                        ( ent
+                        , Violations.entity ent checkAll ignoredChecks
+                        )
+                    )
+                |> List.map
+                    (\( ent, violated ) ->
+                        ( ent.range.start.row
+                        , Issue.fromViolationsAndTrigger
+                            violated
+                            (Issue.Entity ent)
+                        )
+                    )
     in
     List.concat [ topLevelCommentIssues, otherCommentsIssues, entityIssues ]
         |> List.sortBy (\( row, _ ) -> row)
@@ -44,7 +86,7 @@ getIssues parsed config =
         |> List.filterMap identity
 
 
-{-| Returns the string representation of the failed checks.
+{-| Represents the failed checks as strings.
 -}
 getIssuesString : Models.ParsedModule -> Configuration.Model -> String
 getIssuesString parsed config =
@@ -54,7 +96,7 @@ getIssuesString parsed config =
         |> String.join "\n"
 
 
-{-| Returns the JSON representation of the failed checks.
+{-| Represents the failed checks as a JSON object.
 -}
 getIssuesJSON : Models.ParsedModule -> Configuration.Model -> Json.Encode.Value
 getIssuesJSON parsed config =

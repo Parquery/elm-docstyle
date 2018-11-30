@@ -1,5 +1,8 @@
 port module Main exposing (main)
 
+{-| Is the main module of the application.
+-}
+
 import Checker
 import Configuration
 import Elm.Parser
@@ -61,11 +64,19 @@ update msg model =
                             else
                                 Checker.getIssuesJSON innerRepr model.config
                     in
-                    ( { model | humanReadableResult = toString issues }, toPort issues )
+                    ( { model | humanReadableResult = toString issues }
+                    , toPort issues
+                    )
 
                 Err e ->
-                    ( { model | humanReadableResult = "error while parsing your code: " ++ toString e }
-                    , toPort <| Encode.string <| "error while parsing your code: " ++ toString e
+                    ( { model
+                        | humanReadableResult =
+                            "error while parsing your code: " ++ toString e
+                      }
+                    , toPort <|
+                        Encode.string <|
+                            "error while parsing your code: "
+                                ++ toString e
                     )
 
         NoOp ->
@@ -84,17 +95,11 @@ msgDecode val =
         |> Result.withDefault NoOp
 
 
-
--- SERIALIZATION
-
-
+{-| Sends an encoded value to the JS wrapper of the Elm app.
+-}
 toPort : Encode.Value -> Cmd Msg
 toPort val =
     outgoing val
-
-
-
--- PORTS
 
 
 port outgoing : Encode.Value -> Cmd msg
@@ -103,10 +108,8 @@ port outgoing : Encode.Value -> Cmd msg
 port incoming : (Encode.Value -> msg) -> Sub msg
 
 
-
--- WIREING
-
-
+{-| Launches the application as a view-less Elm app.
+-}
 main : Program Models.Flags Model Msg
 main =
     Platform.programWithFlags

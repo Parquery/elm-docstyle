@@ -1,5 +1,8 @@
 module Parsing.EntityCommentTest exposing (parseEntityCommentTest)
 
+{-| Tests the correct parsing of entities.
+-}
+
 import Elm.Parser
 import Elm.Processing
 import Elm.Syntax.File
@@ -30,13 +33,15 @@ parseEntityCommentTest =
                 Just m ->
                     m.entities
                         |> List.head
-                        |> Maybe.map (\ent -> Expect.equal ent.comment expected)
-                        |> Maybe.withDefault (Expect.fail "No entities parsed.")
+                        |> Maybe.map
+                            (\ent -> Expect.equal ent.comment expected)
+                        |> Maybe.withDefault
+                            (Expect.fail "No entities parsed.")
 
                 Nothing ->
                     Expect.fail "Failed to parse the module!"
     in
-    Test.describe "Test the intermediate representation parsing function for the declaration comments."
+    Test.describe "Test the parsing function for the declaration comments."
         [ Test.describe "Modules with no declarations."
             (List.indexedMap
                 (\idx ->
@@ -63,7 +68,8 @@ parseEntityCommentTest =
                 , moduleNoImportsWithoutDoc
                 ]
             )
-        , Test.describe "Modules with wrong comment format, which does not get parsed."
+        , Test.describe
+            "Modules with wrong comment format, which does not get parsed."
             (List.indexedMap
                 (\idx ->
                     \moduleStr ->
@@ -77,16 +83,20 @@ parseEntityCommentTest =
             )
         , Test.test "Module with documented type 1." <|
             \() ->
-                checkExpectation (expectedComment 2 0 3 2) moduleWithDocumentedTypeAndNoDoc
+                checkExpectation (expectedComment 2 0 3 2)
+                    moduleWithDocumentedTypeAndNoDoc
         , Test.test "Module with documented type 2." <|
             \() ->
-                checkExpectation (expectedComment 5 0 6 2) moduleWithDocumentedTypeAndDoc
+                checkExpectation (expectedComment 5 0 6 2)
+                    moduleWithDocumentedTypeAndDoc
         , Test.test "Module with documented type 3." <|
             \() ->
-                checkExpectation (expectedComment 9 0 10 2) moduleWithDocumentedTypeAndImportsAndDoc
+                checkExpectation (expectedComment 9 0 10 2)
+                    moduleWithDocumentedTypeAndImportsAndDoc
         , Test.test "Module with documented type 4." <|
             \() ->
-                checkExpectation (expectedComment 11 0 12 2) largerExample
+                checkExpectation (expectedComment 11 0 12 2)
+                    largerExample
         ]
 
 

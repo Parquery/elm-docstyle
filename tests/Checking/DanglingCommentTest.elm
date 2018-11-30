@@ -1,6 +1,6 @@
 module Checking.DanglingCommentTest exposing (checkDanglingCommentTest)
 
-import Constraints
+import Check
 import Elm.Parser
 import Elm.Processing
 import Elm.Syntax.File
@@ -10,6 +10,7 @@ import Intermediate
 import Models
 import Test
 import TestUtil
+import Violations
 
 
 checkDanglingCommentTest : Test.Test
@@ -20,7 +21,10 @@ checkDanglingCommentTest =
                 Just m ->
                     m.otherComments
                         |> List.head
-                        |> Maybe.map (\cm -> Constraints.getViolationsDangling cm ignored)
+                        |> Maybe.map
+                            (\cm ->
+                                Violations.dangling cm ignored
+                            )
                         |> Maybe.withDefault []
                         |> Expect.equalLists expected
 
@@ -37,32 +41,32 @@ checkDanglingCommentTest =
         , Test.test "Empty dangling comment 1." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
+                    [ Check.NoStartingSpace
+                    , Check.NoEndingPeriod
                     ]
                     moduleWithEmptyDangling1
                     []
         , Test.test "Empty dangling comment 2." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
+                    [ Check.NoStartingSpace
+                    , Check.NoEndingPeriod
                     ]
                     moduleWithEmptyDangling2
                     []
         , Test.test "Wrong dangling comment type." <|
             \() ->
                 checkExpectation
-                    [ Constraints.WrongCommentType ]
+                    [ Check.WrongCommentType ]
                     moduleWithDanglingDocComment
                     []
         , Test.test "Larger example." <|
             \() ->
                 checkExpectation
-                    [ Constraints.NotCapitalized
-                    , Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
-                    , Constraints.TodoComment
+                    [ Check.NotCapitalized
+                    , Check.NoStartingSpace
+                    , Check.NoEndingPeriod
+                    , Check.TodoComment
                     ]
                     largerExample
                     []
@@ -71,10 +75,10 @@ checkDanglingCommentTest =
                 checkExpectation
                     []
                     largerExample
-                    [ Constraints.NotCapitalized
-                    , Constraints.NoStartingSpace
-                    , Constraints.NoEndingPeriod
-                    , Constraints.TodoComment
+                    [ Check.NotCapitalized
+                    , Check.NoStartingSpace
+                    , Check.NoEndingPeriod
+                    , Check.TodoComment
                     ]
         ]
 

@@ -79,7 +79,8 @@ type alias Verbose =
   - ´verbose´ -- if set, the output of the string format is verbose;
   - ´format´ -- the output format, amongst "human" or "json". If empty, "human" is assumed;
   - ´excludedChecks´ -- contains the checks to be ignored by the checker;
-  - ´checkAllDefinitions´ -- if false, the program checks the existence of comments only for unexposed type and function definitions; if true, it checks all.
+  - ´checkAllDefinitions´ -- if false, the program checks the existence of comments only for
+    unexposed type and function definitions; if true, it checks all.
 
 -}
 type alias Flags =

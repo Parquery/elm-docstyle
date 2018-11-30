@@ -1,5 +1,8 @@
 module Intermediate exposing (translate)
 
+{-| Contains the logic for parsing an Elm source file into the intermediate representation.
+-}
+
 import Dict
 import Elm.Syntax.Declaration exposing (Declaration(..))
 import Elm.Syntax.Exposing
@@ -11,6 +14,8 @@ import Elm.Syntax.TypeAnnotation
 import Models
 
 
+{-| Translates a module parsed by elm-syntax to a custom representation.
+-}
 translate : Elm.Syntax.File.File -> Models.ParsedModule
 translate file =
     let
@@ -30,7 +35,12 @@ translate file =
         entities =
             file.declarations
                 |> List.sortBy (\( range, _ ) -> range.start.row)
-                |> List.map (\dec -> declarationToEntity dec (isExposed file.moduleDefinition))
+                |> List.map
+                    (\dec ->
+                        declarationToEntity
+                            dec
+                            (isExposed file.moduleDefinition)
+                    )
                 |> List.filterMap identity
                 |> List.map
                     (\ent ->
@@ -47,7 +57,14 @@ translate file =
                         (Maybe.map (\_ -> List.drop 1 list) topLevelComment
                             |> Maybe.withDefault list
                         )
-                            |> List.filter (\com -> not (List.member (Just com) (List.map .comment entities)))
+                            |> List.filter
+                                (\com ->
+                                    not
+                                        (List.member
+                                            (Just com)
+                                            (List.map .comment entities)
+                                        )
+                                )
                    )
     in
     { moduleName = moduleName
@@ -83,7 +100,10 @@ isExposed mod entityName =
                     )
 
 
-declarationToEntity : Ranged Declaration -> (String -> Bool) -> Maybe Models.Entity
+declarationToEntity :
+    Ranged Declaration
+    -> (String -> Bool)
+    -> Maybe Models.Entity
 declarationToEntity ( range, declaration ) exp =
     let
         entity =
@@ -110,9 +130,16 @@ declarationToEntity ( range, declaration ) exp =
                     function.declaration.name.value
 
                 comment =
-                    Maybe.map (\docum -> ( docum.range, docum.text )) function.documentation
+                    function.documentation
+                        |> Maybe.map (\docum -> ( docum.range, docum.text ))
             in
-            Just { entity | name = nm, eType = tp, exposed = exp nm, comment = comment }
+            Just
+                { entity
+                    | name = nm
+                    , eType = tp
+                    , exposed = exp nm
+                    , comment = comment
+                }
 
         AliasDecl typeAlias ->
             let
@@ -120,7 +147,8 @@ declarationToEntity ( range, declaration ) exp =
                     typeAlias.name
 
                 comment =
-                    Maybe.map (\docum -> ( docum.range, docum.text )) typeAlias.documentation
+                    typeAlias.documentation
+                        |> Maybe.map (\docum -> ( docum.range, docum.text ))
             in
             case Tuple.second typeAlias.typeAnnotation of
                 Elm.Syntax.TypeAnnotation.Record recordDef ->
@@ -131,7 +159,13 @@ declarationToEntity ( range, declaration ) exp =
                         tp =
                             Models.Record fields
                     in
-                    Just { entity | name = nm, eType = tp, exposed = exp nm, comment = comment }
+                    Just
+                        { entity
+                            | name = nm
+                            , eType = tp
+                            , exposed = exp nm
+                            , comment = comment
+                        }
 
                 _ ->
                     let
@@ -141,7 +175,13 @@ declarationToEntity ( range, declaration ) exp =
                         nm =
                             typeAlias.name
                     in
-                    Just { entity | name = nm, eType = tp, exposed = exp nm, comment = comment }
+                    Just
+                        { entity
+                            | name = nm
+                            , eType = tp
+                            , exposed = exp nm
+                            , comment = comment
+                        }
 
         TypeDecl tajp ->
             let
@@ -151,7 +191,12 @@ declarationToEntity ( range, declaration ) exp =
                 nm =
                     tajp.name
             in
-            Just { entity | name = nm, eType = tp, exposed = exp nm }
+            Just
+                { entity
+                    | name = nm
+                    , eType = tp
+                    , exposed = exp nm
+                }
 
         _ ->
             Nothing
@@ -229,13 +274,14 @@ getTopLevelComment file =
                             toFloat row
 
                         Nothing ->
-                            -- if there are no imports, use the line of the first declaration
+                            -- if there are no imports, use the line of the first declaration.
                             rowFirstDeclaration
                                 |> Maybe.map toFloat
-                                -- if there are no declarations, then any docs comment will be the module comment.
+                                -- if there are no declarations, any docs comment will be the module comment.
                                 |> Maybe.withDefault (1 / 0)
             in
-            String.startsWith "{-|" comment && toFloat range.start.row < firstRow
+            String.startsWith "{-|" comment
+                && (toFloat range.start.row < firstRow)
 
         firstComment : Maybe Models.Comment
         firstComment =

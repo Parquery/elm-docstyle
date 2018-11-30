@@ -1,17 +1,33 @@
 module Configuration exposing (Format(..), Model, defaultModel, fromFlags)
 
-import Constraints
+{-| Contains the configuration for customizing elm-docstyle's behavior.
+-}
+
+import Check
 import Models
 
 
+{-| Creates a configuration record from the flags passed to elm-docsytle.
+
+  - `verbose` -- if set, the violations will include the offending comment
+  - `format` -- human or JSON format for the checks
+  - `excludedChecks` -- an optional list of constraints to ignore
+  - `checkAllDefinitions` -- if set, all declarations are checked;
+    otherwise, only exported ones.
+
+-}
 fromFlags : Models.Flags -> Result String Model
 fromFlags { verbose, format, excludedChecks, checkAllDefinitions } =
     let
         parsedChecks =
             excludedChecks
-                |> List.map (\str -> ( str, Constraints.stringToViolation str ))
+                |> List.map (\s -> ( s, Check.stringToViolation s ))
                 |> (\list ->
-                        case List.filter (\( _, el ) -> el == Nothing) list of
+                        case
+                            List.filter
+                                (\( _, el ) -> el == Nothing)
+                                list
+                        of
                             [] ->
                                 list
                                     |> List.map Tuple.second
@@ -22,7 +38,14 @@ fromFlags { verbose, format, excludedChecks, checkAllDefinitions } =
                                 lst
                                     |> List.map Tuple.first
                                     |> String.join """", \""""
-                                    |> (\errs -> Err ("""Illegal check name(s): \"""" ++ errs ++ """"."""))
+                                    |> (\errs ->
+                                            Err
+                                                ("Illegal check name(s): "
+                                                    ++ "\""
+                                                    ++ errs
+                                                    ++ "\"."
+                                                )
+                                       )
                    )
 
         parsedFormat =
@@ -33,7 +56,12 @@ fromFlags { verbose, format, excludedChecks, checkAllDefinitions } =
                 Ok JSON
 
             else
-                Err ("""Failed to parse the format flag. Expected "", "human" or "json", got: """ ++ format)
+                Err
+                    ("Failed to parse the format flag. "
+                        ++ "Expected \"\", \"human\" or \"json\""
+                        ++ ", got: "
+                        ++ format
+                    )
     in
     case parsedFormat of
         Ok fmt ->
@@ -51,15 +79,24 @@ fromFlags { verbose, format, excludedChecks, checkAllDefinitions } =
             Err err
 
 
+{-| Is the configuration model.
+
+  - `excludedChecks` -- an optional list of constraints to ignore
+  - `checkAllDefinitions` -- if set, all declarations are checked;
+    otherwise, only exported ones.
+  - `verbose` -- if set, the violations will include the offending comment
+  - `format` -- human or JSON format for the checks
+
+-}
 type alias Model =
-    { excludedChecks : List Constraints.Type
+    { excludedChecks : List Check.Type
     , checkAllDefinitions : Bool
     , verbose : Models.Verbose
     , format : Format
     }
 
 
-{-| Default value for the config model.
+{-| Is the default value for the configuration model.
 -}
 defaultModel : Model
 defaultModel =
@@ -75,6 +112,8 @@ defaultFormat =
     HUMAN
 
 
+{-| Contains the supported formats.
+-}
 type Format
     = JSON
     | HUMAN
