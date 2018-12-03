@@ -1,6 +1,9 @@
 module Messages exposing (checkToString, commentToString, entityToString, entityTypeToString, issueToString)
 
-{-| Contains function to translate records to strings.
+{-| Provides functions to translate various models to human-readable descriptions.
+
+For example, models from the intermediate representations and failed checks.
+
 -}
 
 import Check
@@ -8,9 +11,9 @@ import Issue
 import Models exposing (Entity, EntityType(..), Verbose)
 
 
-{-| Computes the string representation of an Entity.
+{-| Represents the given Entity as a string.
 
-If verbose=True, the comment is included fully.
+If verbose=True, the comment is included in full.
 
 -}
 entityToString : Entity -> Verbose -> String
@@ -50,7 +53,7 @@ entityToString { range, eType, name, comment, exposed } verbose =
         ++ suffix
 
 
-{-| Computes the string representation of an EntityType.
+{-| Represents the given Comment as a string.
 
 If verbose=True, the comment is included in full.
 
@@ -73,7 +76,7 @@ commentToString ( range, comment ) verbose =
         ++ suffix
 
 
-{-| Computes the string representation of an Issue.
+{-| Represents the given Issue as a string.
 -}
 issueToString : Bool -> Issue.Issue -> String
 issueToString verbose issue =
@@ -111,7 +114,7 @@ issueToString verbose issue =
                         ++ violatedStr
 
 
-{-| Computes the string representation of an EntityType.
+{-| Represents the given EntityType as a string.
 -}
 entityTypeToString : EntityType -> String
 entityTypeToString entType =
@@ -142,7 +145,7 @@ entityTypeToString entType =
             "type alias"
 
 
-{-| Describes a violated check.
+{-| Represents the given Check as a string.
 -}
 checkToString : Check.Type -> String
 checkToString tajp =
@@ -151,14 +154,17 @@ checkToString tajp =
             "the first line of the comment does not start with a space"
 
         Check.NotCapitalized ->
-            "in one line of the comment, the first word is not capitalized"
+            "the first word of the comment is not capitalized"
 
         Check.NoStartingVerb ->
-            "one line of the comment does not start "
+            "the first line of the comment does not start "
                 ++ "with a verb in third person (stem -s)"
 
         Check.NoEndingPeriod ->
-            "one line of the comment does not end with a period"
+            "the first line of the comment does not end with a period"
+
+        Check.EmptyComment ->
+            "the comment does not contain any text"
 
         Check.WrongCommentType ->
             "the comment syntax {-|...-} is not allowed here"

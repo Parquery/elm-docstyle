@@ -31,32 +31,97 @@ parseTopLevelCommentTest =
     Test.describe "Test the parsing function for the top level comment."
         [ Test.test "Empty module with doc." <|
             \() ->
-                checkExpectation expectedDocs emptyModuleWithDoc
+                checkExpectation expectedDocs
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+                    """ |> TestUtil.dedent 20)
         , Test.test "Empty module without doc." <|
             \() ->
-                checkExpectation Nothing emptyModuleWithoutDoc
+                checkExpectation Nothing
+                    """module SomeName exposing (..)"""
         , Test.test "Module with doc and no imports." <|
             \() ->
-                checkExpectation expectedDocs moduleNoImportsWithDoc
+                checkExpectation expectedDocs
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
         , Test.test "Module without doc and no imports." <|
             \() ->
-                checkExpectation Nothing moduleNoImportsWithoutDoc
+                checkExpectation Nothing
+                    ("""
+                    module SomeName exposing (..)
+
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
         , Test.test "Module with doc and no declarations." <|
             \() ->
-                checkExpectation expectedDocs moduleNoDeclarationsWithDoc
+                checkExpectation expectedDocs
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    """ |> TestUtil.dedent 20)
         , Test.test "Module without doc and no declarations." <|
             \() ->
-                checkExpectation Nothing moduleNoDeclarationsWithoutDoc
+                checkExpectation Nothing
+                    ("""
+                    module SomeName exposing (..)
+
+                    import Dict
+                    import List
+                    """ |> TestUtil.dedent 20)
         , Test.test "Module with doc and commented declaration." <|
             \() ->
-                checkExpectation expectedDocs moduleWithDocumentedTypeAndDoc
+                checkExpectation expectedDocs
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
         , Test.test "Module without doc and commented declaration." <|
             \() ->
-                checkExpectation Nothing moduleWithDocumentedTypeAndNoDoc
+                checkExpectation Nothing
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
         , Test.test "Module with doc and imports and commented declaration." <|
             \() ->
                 checkExpectation expectedDocs
-                    moduleWithDocumentedTypeAndImportsAndDoc
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    import Models
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
         , Test.test "Larger example." <|
             \() ->
                 checkExpectation
@@ -65,174 +130,69 @@ parseTopLevelCommentTest =
                         , "{-| This module is empty. One day, though...\n-}"
                         )
                     )
-                    largerExample
-        , Test.test "Doc with wrong comment type 1." <|
+                    ("""
+                    module SomeName exposing (SomeType
+                            , buildSomeType
+                            )
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    import Models
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+
+                    {-| buildSomeType builds some type.
+                    -}
+                    buildSomeType = "hello"
+                    """ |> TestUtil.dedent 20)
+        , Test.test "Doc with wrong comment type {--}." <|
             \() ->
-                checkExpectation Nothing moduleWithWrongDocsType1
-        , Test.test "Doc with wrong comment type 2." <|
+                checkExpectation Nothing
+                    ("""
+                    module SomeName exposing (SomeType
+                                , buildSomeType
+                                )
+
+                    {- This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    import Models
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+
+                    {-| buildSomeType builds some type.
+                    -}
+                    buildSomeType = "hello"
+                    """ |> TestUtil.dedent 20)
+        , Test.test "Doc with wrong comment type --." <|
             \() ->
-                checkExpectation Nothing moduleWithWrongDocsType2
+                checkExpectation Nothing
+                    ("""
+                    module SomeName exposing (SomeType
+                                        , buildSomeType
+                                        )
+
+                    -- This module is empty. One day, though...
+
+                    import Dict
+                    import List
+                    import Models
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+
+                    {-| buildSomeType builds some type.
+                    -}
+                    buildSomeType = "hello"
+                    """ |> TestUtil.dedent 20)
         ]
-
-
-emptyModuleWithDoc : String
-emptyModuleWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-"""
-
-
-emptyModuleWithoutDoc : String
-emptyModuleWithoutDoc =
-    """module SomeName exposing (..)
-"""
-
-
-moduleNoImportsWithDoc : String
-moduleNoImportsWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-type alias SomeType = String
-"""
-
-
-moduleNoImportsWithoutDoc : String
-moduleNoImportsWithoutDoc =
-    """module SomeName exposing (..)
-
-type alias SomeType = String
-"""
-
-
-moduleNoDeclarationsWithDoc : String
-moduleNoDeclarationsWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-"""
-
-
-moduleNoDeclarationsWithoutDoc : String
-moduleNoDeclarationsWithoutDoc =
-    """module SomeName exposing (..)
-
-import Dict
-import List
-"""
-
-
-moduleWithDocumentedTypeAndNoDoc : String
-moduleWithDocumentedTypeAndNoDoc =
-    """module SomeName exposing (..)
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-moduleWithDocumentedTypeAndDoc : String
-moduleWithDocumentedTypeAndDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-moduleWithDocumentedTypeAndImportsAndDoc : String
-moduleWithDocumentedTypeAndImportsAndDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-import Models
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-largerExample : String
-largerExample =
-    """module SomeName exposing (SomeType
-                                , buildSomeType
-                                )
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-import Models
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-
-{-| buildSomeType builds some type.
--}
-buildSomeType = "hello"
-"""
-
-
-moduleWithWrongDocsType1 : String
-moduleWithWrongDocsType1 =
-    """module SomeName exposing (SomeType
-                                , buildSomeType
-                                )
-
-{- This module is empty. One day, though...
--}
-
-import Dict
-import List
-import Models
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-
-{-| buildSomeType builds some type.
--}
-buildSomeType = "hello"
-"""
-
-
-moduleWithWrongDocsType2 : String
-moduleWithWrongDocsType2 =
-    """module SomeName exposing (SomeType
-                                , buildSomeType
-                                )
-
--- This module is empty. One day, though...
-
-import Dict
-import List
-import Models
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-
-{-| buildSomeType builds some type.
--}
-buildSomeType = "hello"
-"""

@@ -1,3 +1,4 @@
 {
-  "excludedChecks": ["NotAnnotatedArgument"]
+  "excludedChecks": ["NotAnnotatedArgument"],
+  "excludedPaths": ["tests"]
 }

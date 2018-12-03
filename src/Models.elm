@@ -1,13 +1,13 @@
 module Models exposing (Comment, Entity, EntityType(..), Flags, ParsedModule, Verbose)
 
-{-| Models for the parsing representation of an Elm module.
+{-| Provides models for the parsing representation of an Elm module.
 -}
 
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 
 
-{-| Describes the possible top-level definition types.
+{-| Describes the top-level definition types.
 -}
 type EntityType
     = Function (List Parameter)

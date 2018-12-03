@@ -1,4 +1,4 @@
-module Check exposing (Type(..), commentType, endingPeriod, notAnnotatedArgument, notExistingArgument, startingCapitalized, startingSpace, startingVerb, stringToViolation, todoComment)
+module Check exposing (Type(..), commentType, emptyComment, endingPeriod, notAnnotatedArgument, notExistingArgument, startingCapitalized, startingSpace, startingVerb, stringToViolation, todoComment)
 
 {-| Contains the constraints enforced by the checker.
 -}
@@ -22,19 +22,19 @@ startingCapitalized comment =
         Just NotCapitalized
 
 
-{-| Checks whether the comment's first character after the delimiter is a space.
+{-| Checks whether the comment's delimiter is followed a space.
 -}
 startingSpace : String -> Maybe Type
 startingSpace comment =
-    if
-        String.startsWith "{- " comment
-            || String.startsWith "-- " comment
-            || String.startsWith "{-| " comment
-    then
-        Nothing
+    comment
+        |> commentText
+        |> (\text ->
+                if String.trim text == "" || String.startsWith " " text then
+                    Nothing
 
-    else
-        Just NoStartingSpace
+                else
+                    Just NoStartingSpace
+           )
 
 
 {-| Checks whether the comment's first word is a verb in third person (stem -s).
@@ -43,9 +43,9 @@ startingVerb : String -> Maybe Type
 startingVerb comment =
     let
         firstWord =
-            String.words comment
-                -- drop the prefix (--, {- or {-|).
-                |> List.drop 1
+            comment
+                |> commentText
+                |> String.words
                 |> List.head
                 -- if no words, no violation of the rule.
                 |> Maybe.withDefault "s"
@@ -66,14 +66,10 @@ endingPeriod : String -> Maybe Type
 endingPeriod comment =
     let
         last =
-            if String.endsWith "-}" comment then
-                comment
-                    |> String.dropRight 2
-                    |> String.trim
-                    |> String.right 1
-
-            else
-                String.right 1 comment
+            comment
+                |> commentText
+                |> String.trim
+                |> String.right 1
     in
     if last == "." || last == "" then
         Nothing
@@ -97,6 +93,22 @@ todoComment comment =
 
                 else
                     Nothing
+           )
+
+
+{-| Checks whether the comment contains any text.
+-}
+emptyComment : String -> Maybe Type
+emptyComment comment =
+    comment
+        |> commentText
+        |> String.words
+        |> (\words ->
+                if List.any (\word -> String.trim word /= "") words then
+                    Nothing
+
+                else
+                    Just EmptyComment
            )
 
 
@@ -131,20 +143,47 @@ notExistingArgument parsedArguments allowed =
         |> List.map NotExistingArgument
 
 
+{-| Removes the comment delimiters from the comment.
+-}
+commentText : String -> String
+commentText comment =
+    (if String.startsWith "{-|" comment then
+        String.dropLeft 3 comment
+
+     else if String.startsWith "{-" comment then
+        String.dropLeft 2 comment
+
+     else if String.startsWith "--" comment then
+        String.dropLeft 2 comment
+
+     else
+        comment
+    )
+        |> (\com ->
+                if String.endsWith "-}" com then
+                    String.dropRight 2 com
+
+                else
+                    com
+           )
+
+
 {-| Describes a check violation.
 -}
 type Type
     = -- the first word should be capitalized.
       NotCapitalized
-      -- the comment should start with a space.
+      -- should start with a space.
     | NoStartingSpace
-      -- the comment should start with a verb in present tense and third person (stem -s).
+      -- should start with a verb in present tense and third person (stem -s).
     | NoStartingVerb
-      -- the comment should end with a period (ignoring one newline).
+      -- should end with a period (ignoring one newline).
     | NoEndingPeriod
-      -- wrong documentation comment type "{-|-}" for a non-documentation comment.
+      -- should contain some text.
+    | EmptyComment
+      -- wrong documentation comment "{-|-}" for a non-documentation comment.
     | WrongCommentType
-      -- the comment should not contain the strings (with no dots) "t.o.d.o" or "f.i.x.m.e".
+      -- should not contain the strings "to-do" or "fix-me" (without dash).
     | TodoComment
       -- a comment is expected on top of the entity.
     | NoEntityComment
@@ -172,6 +211,9 @@ stringToViolation str =
 
         "NoEndingPeriod" ->
             Just NoEndingPeriod
+
+        "EmptyComment" ->
+            Just EmptyComment
 
         "WrongCommentType" ->
             Just WrongCommentType

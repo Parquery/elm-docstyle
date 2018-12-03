@@ -32,35 +32,73 @@ checkDanglingCommentTest =
                     Expect.fail "Failed to parse the module!"
     in
     Test.describe "Test the checker on the dangling comments."
-        [ Test.test "Ok dangling comment 1." <|
+        [ Test.test "Ok dangling comment wrapped in {--}." <|
             \() ->
-                checkExpectation [] moduleWithOkDangling1 []
-        , Test.test "Ok dangling comment 2." <|
+                checkExpectation []
+                    ("""
+                    module SomeName exposing (..)
+
+                    {- A dangling comment.-}
+                    """
+                        |> TestUtil.dedent 20
+                    )
+                    []
+        , Test.test "Ok dangling comment wrapped in --." <|
             \() ->
-                checkExpectation [] moduleWithOkDangling2 []
-        , Test.test "Empty dangling comment 1." <|
+                checkExpectation []
+                    ("""
+                    module SomeName exposing (..)
+
+                    -- A dangling comment.
+                    """
+                        |> TestUtil.dedent 20
+                    )
+                    []
+        , Test.test "Empty dangling comment wrapped in {--}." <|
             \() ->
                 checkExpectation
-                    [ Check.NoStartingSpace
-                    , Check.NoEndingPeriod
-                    ]
-                    moduleWithEmptyDangling1
+                    [ Check.EmptyComment ]
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-
+
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
-        , Test.test "Empty dangling comment 2." <|
+        , Test.test "Empty dangling comment wrapped in --." <|
             \() ->
                 checkExpectation
-                    [ Check.NoStartingSpace
-                    , Check.NoEndingPeriod
-                    ]
-                    moduleWithEmptyDangling2
+                    [ Check.EmptyComment ]
+                    ("""
+                    module SomeName exposing (..)
+
+                    --
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
-        , Test.test "Wrong dangling comment type." <|
+        , Test.test "Wrong dangling comment type (documentation comment)." <|
             \() ->
                 checkExpectation
                     [ Check.WrongCommentType ]
-                    moduleWithDanglingDocComment
+                    ("""
+                    module SomeName exposing (..)
+
+                    import String
+
+
+                    type alias Tp = Int
+
+                    {-| This is a well-formed but ill-placed dangling comment.
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
-        , Test.test "Larger example." <|
+        , Test.test "Larger example: comment violating numerous checks." <|
             \() ->
                 checkExpectation
                     [ Check.NotCapitalized
@@ -68,75 +106,38 @@ checkDanglingCommentTest =
                     , Check.NoEndingPeriod
                     , Check.TodoComment
                     ]
-                    largerExample
+                    ("""
+                    module SomeName exposing (..)
+
+                    import String
+
+
+                    type alias Tp = Int
+
+                    --this is a poorly-formed dangling comment. fixme: make it better
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
-        , Test.test "Larger example, with ignored checks." <|
+        , Test.test "Larger example, ignoring all violated checks." <|
             \() ->
                 checkExpectation
                     []
-                    largerExample
+                    ("""
+                    module SomeName exposing (..)
+
+                    import String
+
+
+                    type alias Tp = Int
+
+                    --this is a poorly-formed dangling comment. fixme: make it better
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     [ Check.NotCapitalized
                     , Check.NoStartingSpace
                     , Check.NoEndingPeriod
                     , Check.TodoComment
                     ]
         ]
-
-
-moduleWithOkDangling1 : String
-moduleWithOkDangling1 =
-    """module SomeName exposing (..)
-
-{- A dangling comment.-}
-"""
-
-
-moduleWithOkDangling2 : String
-moduleWithOkDangling2 =
-    """module SomeName exposing (..)
-
--- A dangling comment.
-"""
-
-
-moduleWithEmptyDangling1 : String
-moduleWithEmptyDangling1 =
-    """module SomeName exposing (..)
-
-{--}
-"""
-
-
-moduleWithEmptyDangling2 : String
-moduleWithEmptyDangling2 =
-    """module SomeName exposing (..)
-
---
-"""
-
-
-moduleWithDanglingDocComment : String
-moduleWithDanglingDocComment =
-    """module SomeName exposing (..)
-
-import String
-
-
-type alias Tp = Int
-
-{-| This is a well-formed but ill-placed dangling comment.
--}
-"""
-
-
-largerExample : String
-largerExample =
-    """module SomeName exposing (..)
-
-import String
-
-
-type alias Tp = Int
-
---this is a poorly-formed dangling comment. fixme: make it better
-"""

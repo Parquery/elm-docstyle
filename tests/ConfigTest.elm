@@ -16,7 +16,7 @@ import Test
 configTest : Test.Test
 configTest =
     Test.describe "Test config parsing."
-        [ Test.test "Test that flags are correctly parsed 1." <|
+        [ Test.test "Test that flags are correctly parsed with format=JSON." <|
             \() ->
                 Expect.equal
                     (Ok
@@ -36,7 +36,7 @@ configTest =
                      in
                      Configuration.fromFlags flags
                     )
-        , Test.test "Test that flags are correctly parsed 2." <|
+        , Test.test "Test that flags are correctly parsed with format=HUMAN." <|
             \() ->
                 Expect.equal
                     (Ok
@@ -74,7 +74,7 @@ configTest =
                      in
                      Configuration.fromFlags flags
                     )
-        , Test.test "Test that excluded checks are correctly parsed 1." <|
+        , Test.test "Test that excluded checks are correctly parsed (small test)." <|
             \() ->
                 Expect.equal
                     [ Check.TodoComment
@@ -94,7 +94,7 @@ configTest =
                         |> Result.map .excludedChecks
                         |> Result.withDefault []
                     )
-        , Test.test "Test that excluded checks are correctly parsed 2." <|
+        , Test.test "Test that excluded checks are correctly parsed (larger test)." <|
             \() ->
                 Expect.equal
                     [ Check.NotCapitalized
@@ -122,7 +122,7 @@ configTest =
                         |> Result.map .excludedChecks
                         |> Result.withDefault []
                     )
-        , Test.test "Test that non-existing checks throw an error." <|
+        , Test.test "Test that non-existing excluded checks throw an error." <|
             \() ->
                 Expect.equal
                     (Err

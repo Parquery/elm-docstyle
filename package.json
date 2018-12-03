@@ -11,11 +11,11 @@
   },
   "scripts": {
     "run": "node dist/bin/index.js",
-    "prepare": "npm run format && npm run analyse && npm run docstyle && npm run test",
+    "prepare": "npm run build && npm run format && npm run analyse && npm run docstyle && npm run test",
     "build": "elm-make src/Main.elm  --output dist/checker.js",
     "format": "elm-format --elm-version=0.18 src/ tests/ --yes ",
     "analyse": "elm-analyse && elm-analyse tests/",
-    "docstyle": "elm-docstyle src/ tests/ --config_path elm-docstyle.json",
+    "docstyle": "elm-docstyle . --config_path elm-docstyle.json --check_all",
     "test": "elm-test"
   },
   "repository": {
@@ -30,7 +30,11 @@
     "code",
     "quality"
   ],
-  "author": "Teodoro Filippini",
+  "author": "Teodoro Filippini <teodoro.filippini@gmail.com>",
+  "constributors" : [
+    "Teodoro Filippini <teodoro.filippini@gmail.com>",
+    "Marko Ristin <marko.ristin@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Parquery/elm-docstyle/issues"

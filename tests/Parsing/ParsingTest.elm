@@ -22,7 +22,7 @@ parseTest =
                 Nothing ->
                     Expect.fail "Failed to parse the module!"
     in
-    Test.describe "Test the parsing function in its entirety."
+    Test.describe "Test the result of the parsing function against expected ParsedModules."
         [ Test.test "Empty module." <|
             \() ->
                 checkExpectation
@@ -32,7 +32,7 @@ parseTest =
                     , otherComments = []
                     }
                     "module SomeName exposing (..)"
-        , Test.test "Large example." <|
+        , Test.test "Populated Module." <|
             \() ->
                 checkExpectation
                     { moduleName = "SomeName"
@@ -69,30 +69,26 @@ parseTest =
                           )
                         ]
                     }
-                    largeExample
+                    ("""
+                    module SomeName exposing (SomeType
+                                             , buildSomeType
+                                             )
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    import Models
+
+                    -- just a dangling comment
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+
+                    {-| buildSomeType builds some type.
+                    -}
+                    buildSomeType = "hello"
+                    """ |> TestUtil.dedent 20)
         ]
-
-
-largeExample : String
-largeExample =
-    """module SomeName exposing (SomeType
-                                , buildSomeType
-                                )
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-import Models
-
--- just a dangling comment
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-
-{-| buildSomeType builds some type.
--}
-buildSomeType = "hello"
-"""

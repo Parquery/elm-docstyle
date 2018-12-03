@@ -10,9 +10,9 @@ import Regex
 
 {-| Computes the failed checks for an entity.
 
-  - `checkAllDefinitions` -- if false, the entity is checked only if it exposed;
+  - ´checkAllDefinitions´ -- if false, the entity is checked only if it exposed;
     otherwise, it is checked irregardless.
-  - `ignored` -- the list of the checks not to be performed.
+  - ´ignored´ -- the list of the checks not to be performed.
 
 -}
 entity : Models.Entity -> Bool -> List Check.Type -> List Check.Type
@@ -54,7 +54,10 @@ entity entity checkAllDefinitions ignored =
                                     ]
                                 )
                             |> Maybe.withDefault []
-                            |> List.append [ Check.todoComment comment ]
+                            |> List.append
+                                [ Check.todoComment comment
+                                , Check.emptyComment comment
+                                ]
                             |> List.filterMap identity
                             |> List.append notExistingArgsCheck
                             |> List.append notAnnotatedArgsCheck
@@ -83,11 +86,15 @@ entity entity checkAllDefinitions ignored =
                                     [ Check.startingCapitalized line
                                     , Check.startingVerb line
                                     , Check.startingSpace line
+                                    , Check.emptyComment line
                                     , Check.endingPeriod line
                                     ]
                                 )
                             |> Maybe.withDefault []
-                            |> List.append [ Check.todoComment comment ]
+                            |> List.append
+                                [ Check.todoComment comment
+                                , Check.emptyComment comment
+                                ]
                             |> List.filterMap identity
                             |> List.append notExistingArgsCheck
                             |> List.append notAnnotatedArgsCheck
@@ -104,11 +111,15 @@ entity entity checkAllDefinitions ignored =
                                     [ Check.startingCapitalized line
                                     , Check.startingVerb line
                                     , Check.endingPeriod line
+                                    , Check.emptyComment line
                                     , Check.startingSpace line
                                     ]
                                 )
                             |> Maybe.withDefault []
-                            |> List.append [ Check.todoComment comment ]
+                            |> List.append
+                                [ Check.todoComment comment
+                                , Check.emptyComment comment
+                                ]
                             |> List.filterMap identity
 
             Nothing ->
@@ -131,7 +142,7 @@ entity entity checkAllDefinitions ignored =
 
 {-| Computes the failed checks for a dangling comment.
 
-  - `ignored` -- the list of the checks not to be performed.
+  - ´ignored´ -- the list of the checks not to be performed.
 
 -}
 dangling : Models.Comment -> List Check.Type -> List Check.Type
@@ -151,6 +162,7 @@ dangling ( _, comment ) ignored =
     , Check.endingPeriod commentLine
     , Check.commentType commentLine
     , Check.todoComment commentLine
+    , Check.emptyComment comment
     ]
         |> List.filterMap identity
         |> filterIgnored ignored
@@ -158,7 +170,7 @@ dangling ( _, comment ) ignored =
 
 {-| Computes the failed checks for a top-level comment (or lack thereof).
 
-  - `ignored` -- the list of the checks not to be performed.
+  - ´ignored´ -- the list of the checks not to be performed.
 
 -}
 topLevel : Maybe Models.Comment -> List Check.Type -> List Check.Type
@@ -167,6 +179,7 @@ topLevel maybeComment ignored =
         Just ( _, comment ) ->
             [ Check.startingSpace comment
             , Check.todoComment comment
+            , Check.emptyComment comment
             ]
                 |> List.filterMap identity
 
@@ -176,18 +189,15 @@ topLevel maybeComment ignored =
         |> filterIgnored ignored
 
 
-{-| Contains a matcher for a documentation argument check.
+{-| Defines a matcher for a documentation argument check.
 
-It matches arguments documented like:
-"\* ´argname´ --", or
-"\* ´argname´ &mdash;".
-
-  - ´hello´ -- some explanation
+It matches arguments documented like: "- ´some name´ --",
+or "- ´some name´ &mdash;".
 
 -}
 argumentRegex : Regex.Regex
 argumentRegex =
-    Regex.regex "\\* ´([a-zA-Z0-9]+)´ (--|&mdash;)"
+    Regex.regex "- ´([a-zA-Z0-9]+)´ (--|&mdash;)"
 
 
 {-| Parses the documented arguments or fields from a comment.
@@ -206,7 +216,7 @@ parseArguments comment =
         |> List.map matchToArgumentName
 
 
-{-| Returns the difference of the second list and the first.
+{-| Filters the ignored checks from the list of all checks.
 -}
 filterIgnored : List Check.Type -> List Check.Type -> List Check.Type
 filterIgnored toIgnore checks =

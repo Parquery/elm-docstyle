@@ -7,14 +7,15 @@ import Configuration
 import Encoders
 import Issue
 import Json.Encode
+import Messages
 import Models
 import Violations
 
 
 {-| Converts the parsed module to a list of issues.
 
-  - `model` -- the parsed module code.
-  - `config` -- the configuration containing ignored checks and settings.
+  - ´parsed´ -- the parsed module code.
+  - ´config´ -- the configuration containing ignored checks and settings.
 
 -}
 getIssues : Models.ParsedModule -> Configuration.Model -> List Issue.Issue
@@ -91,7 +92,7 @@ getIssues parsed config =
 getIssuesString : Models.ParsedModule -> Configuration.Model -> String
 getIssuesString parsed config =
     getIssues parsed config
-        |> List.map (Issue.issueToString config.verbose)
+        |> List.map (Messages.issueToString config.verbose)
         |> List.map (\str -> parsed.moduleName ++ ": " ++ str)
         |> String.join "\n"
 

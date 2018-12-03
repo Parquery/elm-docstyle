@@ -17,7 +17,7 @@ import Test
 entityToString : Test.Test
 entityToString =
     Test.describe "Test the entityToString function."
-        [ Test.test "Test 1." <|
+        [ Test.test "Test type alias with no comment." <|
             \() ->
                 Expect.equal
                     "line 13, type alias \"someTypeAlias\" with no comment"
@@ -32,7 +32,7 @@ entityToString =
                      in
                      Messages.entityToString entity True
                     )
-        , Test.test "Test 2." <|
+        , Test.test "Test function with no params and a comment." <|
             \() ->
                 Expect.equal
                     ("line 13, exposed function with no parameters "
@@ -54,7 +54,7 @@ entityToString =
                      in
                      Messages.entityToString entity True
                     )
-        , Test.test "Test 3." <|
+        , Test.test "Test function with params and comment." <|
             \() ->
                 Expect.equal
                     ("line 13, function with parameters (aString, anInt) "
@@ -76,7 +76,7 @@ entityToString =
                      in
                      Messages.entityToString entity True
                     )
-        , Test.test "Test 4." <|
+        , Test.test "Test record with fields and comment." <|
             \() ->
                 Expect.equal
                     ("line 13, exposed record with fields (aMap, aListOfInts) "
@@ -94,7 +94,7 @@ entityToString =
                      in
                      Messages.entityToString entity True
                     )
-        , Test.test "Test 5." <|
+        , Test.test "Test type def with no comment." <|
             \() ->
                 Expect.equal
                     "line 13, exposed type definition \"SomeType\""
@@ -117,7 +117,7 @@ entityToString =
 issueToString : Test.Test
 issueToString =
     Test.describe "Test the issueToString function."
-        [ Test.test "Test 1." <|
+        [ Test.test "Test top-level issue to string." <|
             \() ->
                 Expect.equal
                     ("line 2: expected a top-level module comment, "
@@ -129,12 +129,12 @@ issueToString =
                         |> Maybe.map (Messages.issueToString True)
                         |> Maybe.withDefault ""
                     )
-        , Test.test "Test 2." <|
+        , Test.test "Test dangling comment issue to string." <|
             \() ->
                 Expect.equal
                     ("line 13, comment reading \"--some wrong dangling "
-                        ++ "comment.\": in one line of the comment, the first "
-                        ++ "word is not capitalized;\nthe first line of the "
+                        ++ "comment.\": the first word of the comment "
+                        ++ "is not capitalized;\nthe first line of the "
                         ++ "comment does not start with a space."
                     )
                     (Issue.fromViolationsAndTrigger
@@ -149,7 +149,7 @@ issueToString =
                         |> Maybe.map (Messages.issueToString True)
                         |> Maybe.withDefault ""
                     )
-        , Test.test "Test 3." <|
+        , Test.test "Test function declaration issue to string." <|
             \() ->
                 let
                     offendingComment =
@@ -169,7 +169,7 @@ issueToString =
                 Expect.equal
                     ("line 13, exposed function with parameters (aString) "
                         ++ "\"someFunction\" with comment \"{-| A function. "
-                        ++ "Fixme: write a description. -}\": one line of the "
+                        ++ "Fixme: write a description. -}\": the first line of the "
                         ++ "comment does not start with a verb in third person "
                         ++ "(stem -s);\nthe comment contains one of the words "
                         ++ "(todo, fixme)."
@@ -182,7 +182,7 @@ issueToString =
                         |> Maybe.map (Messages.issueToString True)
                         |> Maybe.withDefault ""
                     )
-        , Test.test "Test 4." <|
+        , Test.test "Test record declaration issue to string." <|
             \() ->
                 Expect.equal
                     ("line 13, exposed record with fields (aMap, aListOfInts) "
@@ -200,7 +200,7 @@ issueToString =
                      in
                      Messages.entityToString entity True
                     )
-        , Test.test "Test 5." <|
+        , Test.test "Test type alias declaration issue to string." <|
             \() ->
                 let
                     typeAliasDef =

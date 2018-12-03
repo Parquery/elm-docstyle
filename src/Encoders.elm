@@ -1,6 +1,6 @@
 module Encoders exposing (encodeIssue)
 
-{-| Contains the functions for encoding an Issue to JSON.
+{-| Provides the functions for encoding an Issue to JSON.
 -}
 
 import Elm.Syntax.Range
@@ -57,6 +57,8 @@ encodeTrigger trigger =
                 ]
 
 
+{-| Encodes an Entity to JSON.
+-}
 encodeEntity : Models.Entity -> Json.Encode.Value
 encodeEntity entity =
     Json.Encode.object
@@ -72,6 +74,8 @@ encodeEntity entity =
         ]
 
 
+{-| Encodes a Comment to JSON.
+-}
 encodeComment : Models.Comment -> Json.Encode.Value
 encodeComment ( rng, comment ) =
     Json.Encode.object

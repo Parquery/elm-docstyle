@@ -17,11 +17,7 @@ Usage
 Installation
 ============
 
-Prerequisites
--------------
-
-The following binaries should be available on the path:
-
+The following binaries should be available on the path before the installation:
 
 .. code-block:: bash
 
@@ -57,21 +53,29 @@ Options:
     --config_path       Path to the elm-docstyle JSON config. If unspecified, a default config is used.
     --format            Output format ("human" or "json"). The default is "human".
 
-Elm-docstyle will look recursively for Elm files in all the directories given, excluding the ``elm-stuff``.
+Elm-docstyle will check Elm files in all the given directories recursively, excluding the ``elm-stuff``.
 
 
 Configuration
 =============
 
-You can specify a configuration as a .json file, which needs to contain the field "excludedChecks" as a list of
-strings. The excluded checks will be fed to the checker and ignored.
+You can specify a configuration as a .json file, which needs to contain the fields "excludedChecks" and
+"excludedPaths" as list of strings. The excluded checks will be fed to the checker and ignored, and the excluded
+files will be skipped when analyzing a directory recursively.
 
-Example of a elm-docstyle-config.json file:
+Example of a elm-docstyle.json file:
 
 .. code-block:: JSON
 
     {
-        "excludedChecks": ["TodoComment", "NoTopLevelComment"]
+        "excludedChecks": [
+            "TodoComment",
+            "NoTopLevelComment"
+        ],
+        "excludedPaths": [
+            "src/DirectoryToIgnore",
+            "src/View/FileToIgnore.elm",
+        ]
     }
 
 
@@ -86,10 +90,11 @@ Name                        Explanation
 ==========================  ======================================================================================
 ``NotCapitalized``          the first word of the comment should be capitalized.
 ``NoStartingSpace``         the comment should start with a space.
-``NoStartingVerb``          the comment should start with a verb in third person (stem -s).
+``NoStartingVerb``          the comment should start with a verb in third person singular (stem -s).
 ``NoEndingPeriod``          the first line of the comment should end with a period.
+``EmptyComment``            the comment should contain text apart from newlines and spaces.
 ``WrongCommentType``        the comment type "{-|-}" should not be used in a non-documentation comment.
-``TodoComment``             the comment should not contain the strings (with no dots) "t.o.d.o" or "f.i.x.m.e".
+``TodoComment``             the comment should not contain the strings (in any capitalization) "TODO" or "FIXME".
 ``NoEntityComment``         a comment is expected on top of the declaration, but none was found.
 ``NoTopLevelComment``       a comment is expected for the module, but none was found.
 ``NotExistingArgument``     the name of a documented argument is not included in the declaration's argument names.
@@ -97,19 +102,21 @@ Name                        Explanation
 ==========================  ======================================================================================
 
 We follow the same convention as the Elm core libraries for including arguments in the documentation: specifying
-arguments in the format ``* `arg_name` -- explanation`` or ``* `arg_name` &mdash; explanation``, which render nicely in
-HTML. For instance:
+arguments in the format ``- `arg_name` -- explanation`` or ``- `arg_name` &mdash; explanation``, which render nicely in
+HTML. Multi-line argument explanations should be indented to match the indentation of the argument name.
+For instance:
 
 
 .. code-block:: elm
 
     {-| Represents an entity and its associated comment, if it exists.
 
-      * ´range´ -- the lines range covered by the entity (documentation excluded);
-      * ´eType´ -- the entity type;
-      * ´name´ -- the entity name;
-      * ´comment´ -- the documentation associated with the entity, if any;
-      * ´exposed´ -- True if the module exposes this entity.
+      - ´range´ -- the lines range covered by the entity, excluding the
+        documentation;
+      - ´eType´ -- the entity type;
+      - ´name´ -- the entity name;
+      - ´comment´ -- the documentation associated with the entity, if any;
+      - ´exposed´ -- True if the module exposes this entity.
 
     -}
     type alias Entity =

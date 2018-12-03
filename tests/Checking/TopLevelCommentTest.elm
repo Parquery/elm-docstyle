@@ -35,99 +35,103 @@ checkTopLevelCommentTest =
             \() ->
                 checkExpectation
                     [ Check.NoTopLevelComment ]
-                    emptyModuleWithoutDoc
+                    """module SomeName exposing (..)"""
                     []
         , Test.test "No documentation comment but NoTopLevelComment error ignored." <|
             \() ->
                 checkExpectation
                     []
-                    emptyModuleWithoutDoc
+                    """module SomeName exposing (..)"""
                     [ Check.NoTopLevelComment ]
         , Test.test "t.o.d.o in documentation." <|
             \() ->
                 checkExpectation
                     [ Check.TodoComment ]
-                    moduleWithDocTodo
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. todo: change it.
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
         , Test.test "f.i.x.m.e in documentation." <|
             \() ->
                 checkExpectation
                     [ Check.TodoComment ]
-                    moduleWithDocFixme
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. fixme: change it.
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
         , Test.test "no starting space in documentation." <|
             \() ->
                 checkExpectation
                     [ Check.NoStartingSpace ]
-                    moduleWithOutStartingSpace
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-|This module is empty.
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
+                    []
+        , Test.test "empty top level comment." <|
+            \() ->
+                checkExpectation
+                    [ Check.EmptyComment ]
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-|
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
         , Test.test "Correct documentation comment." <|
             \() ->
                 checkExpectation
                     []
-                    emptyModuleWithDoc
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
-        , Test.test "Several errors." <|
+        , Test.test "No starting space and f.i.x.m.e in comment." <|
             \() ->
                 checkExpectation
                     [ Check.NoStartingSpace, Check.TodoComment ]
-                    moduleWithErrorsInDoc
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-|This module is empty. fixme: change it.
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     []
-        , Test.test "Several errors, all ignored." <|
+        , Test.test "No starting space and f.i.x.m.e in comment, both ignored." <|
             \() ->
                 checkExpectation
                     []
-                    moduleWithErrorsInDoc
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-|This module is empty. fixme: change it.
+                    -}
+                    """
+                        |> TestUtil.dedent 20
+                    )
                     [ Check.NoStartingSpace, Check.TodoComment ]
         ]
-
-
-emptyModuleWithDoc : String
-emptyModuleWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-"""
-
-
-emptyModuleWithoutDoc : String
-emptyModuleWithoutDoc =
-    """module SomeName exposing (..)
-"""
-
-
-moduleWithDocTodo : String
-moduleWithDocTodo =
-    """module SomeName exposing (..)
-
-{-| This module is empty. todo: change it.
--}
-"""
-
-
-moduleWithDocFixme : String
-moduleWithDocFixme =
-    """module SomeName exposing (..)
-
-{-| This module is empty. fixme: change it.
--}
-"""
-
-
-moduleWithOutStartingSpace : String
-moduleWithOutStartingSpace =
-    """module SomeName exposing (..)
-
-{-|This module is empty.
--}
-"""
-
-
-moduleWithErrorsInDoc : String
-moduleWithErrorsInDoc =
-    """module SomeName exposing (..)
-
-{-|This module is empty. fixme: change it.
--}
-"""

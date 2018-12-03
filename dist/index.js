@@ -48,21 +48,32 @@ const args = minimist(process.argv.slice(2), {
     const validFormats = ['json', 'human'];
 
     var excludedChecks = [];
+    var excludedPaths = [];
 
     if (args.config_path !== undefined) {
         try {
             const txt = fs.readFileSync(args.config_path, 'utf8');
 
-            const excluded = (JSON.parse(txt)).excludedChecks;
-            if (excluded === undefined || (excluded instanceof Array) === false
-                || (excluded.length > 0 && (typeof excluded[0] !== "string"))) {
-                console.log("the provided config path does not contain a valid elm-docstyle configuration. " +
-                    "Please refer to the README to see how a correct config file is shaped.");
+            const excludedCks = (JSON.parse(txt)).excludedChecks;
+            const excludedPts = (JSON.parse(txt)).excludedPaths;
+            if (excludedCks === undefined || (excludedCks instanceof Array) === false
+                || (excludedCks.length > 0 && (typeof excludedCks[0] !== "string"))) {
+                console.log("The provided config path does not contain a valid elm-docstyle configuration: " +
+                    "Missing field \"excludedChecks\". Please refer to the README to see how a correct " +
+                    "config file is shaped.");
                 process.exit(1);
             }
-            excludedChecks = excluded;
+            if (excludedPts === undefined || (excludedPts instanceof Array) === false
+                || (excludedPts.length > 0 && (typeof excludedPts[0] !== "string"))) {
+                console.log("The provided config path does not contain a valid elm-docstyle configuration: " +
+                    "Missing field \"excludedPaths\". Please refer to the README to see how a correct " +
+                    "config file is shaped.");
+                process.exit(1);
+            }
+            excludedChecks = excludedCks;
+            excludedPaths = excludedPts;
         } catch (err) {
-            console.log("failed to open the input config_path: " + err);
+            console.log("Failed to open the input config_path: " + err);
             process.exit(1);
         }
     }
@@ -71,7 +82,7 @@ const args = minimist(process.argv.slice(2), {
         format: validFormats.indexOf(args.format) !== -1 ? args.format : 'human'
         , verbose: args.verbose || false
         , excludedChecks: excludedChecks
-        , checkAllDefinitions: args.checkAllDefinitions || false
+        , checkAllDefinitions: args.check_all || false
     });
 
 
@@ -80,14 +91,18 @@ const args = minimist(process.argv.slice(2), {
         reportList.push(newReport);
     });
 
+
     // explore recursively and find all elm files
     var exploreAndSend = function (pth) {
+        if (excludedPaths.some(a=>pth.includes(a))){
+            return;
+        }
         if (pth.endsWith(".elm")) {
             try {
                 const txt = fs.readFileSync(pth, 'utf8');
                 checker.ports.incoming.send(txt);
             } catch (err) {
-                console.log("failed to open the input path " + pth + ": " + err);
+                console.log("Failed to open the input path " + pth + ": " + err);
                 process.exit(1);
             }
         } else {
@@ -106,8 +121,10 @@ const args = minimist(process.argv.slice(2), {
                     process.exit(1);
                 }
             }
-
-            paths.map(path => pth + "/" + path).forEach(a => exploreAndSend(a));
+            if (!pth.endsWith("/")){
+                pth += "/"
+            }
+            paths.map(path => pth + path).forEach(a => exploreAndSend(a));
         }
     };
 

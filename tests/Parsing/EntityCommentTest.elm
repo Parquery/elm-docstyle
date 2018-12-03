@@ -50,10 +50,28 @@ parseEntityCommentTest =
                             ("no declarations " ++ toString idx)
                             (\() -> checkNoEntities moduleStr)
                 )
-                [ emptyModuleWithDoc
-                , emptyModuleWithoutDoc
-                , moduleNoDeclarationsWithDoc
-                , moduleNoDeclarationsWithoutDoc
+                [ """
+                  module SomeName exposing (..)
+
+                  {-| This module is empty. One day, though...
+                  -}
+                  """ |> TestUtil.dedent 18
+                , """module SomeName exposing (..)"""
+                , """
+                  module SomeName exposing (..)
+
+                  {-| This module is empty. One day, though...
+                  -}
+
+                  import Dict
+                  import List
+                  """ |> TestUtil.dedent 18
+                , """
+                  module SomeName exposing (..)
+
+                  import Dict
+                  import List
+                  """ |> TestUtil.dedent 18
                 ]
             )
         , Test.describe "Modules with declarations and no comment."
@@ -64,8 +82,19 @@ parseEntityCommentTest =
                             ("declarations with no comments " ++ toString idx)
                             (\() -> checkExpectation Nothing moduleStr)
                 )
-                [ moduleNoImportsWithDoc
-                , moduleNoImportsWithoutDoc
+                [ """
+                  module SomeName exposing (..)
+
+                  {-| This module is empty. One day, though...
+                  -}
+
+                  type alias SomeType = String
+                  """ |> TestUtil.dedent 18
+                , """
+                  module SomeName exposing (..)
+
+                  type alias SomeType = String
+                  """ |> TestUtil.dedent 18
                 ]
             )
         , Test.describe
@@ -77,167 +106,78 @@ parseEntityCommentTest =
                             ("declarations with no comments " ++ toString idx)
                             (\() -> checkExpectation Nothing moduleStr)
                 )
-                [ moduleWithWrongTypeDocFormat1
-                , moduleWithWrongTypeDocFormat2
+                [ """
+                  module SomeName exposing (..)
+
+                  {-| This module is empty. One day, though...
+                  -}
+
+                  {- SomeType is a type.
+                  -}
+                  type alias SomeType = String
+                  """ |> TestUtil.dedent 18
+                , """
+                  module SomeName exposing (..)
+
+                  {-| This module is empty. One day, though...
+                  -}
+
+                  -- SomeType is a type.
+                  type alias SomeType = String
+                  """ |> TestUtil.dedent 18
                 ]
             )
-        , Test.test "Module with documented type 1." <|
-            \() ->
-                checkExpectation (expectedComment 2 0 3 2)
-                    moduleWithDocumentedTypeAndNoDoc
-        , Test.test "Module with documented type 2." <|
+        , Test.test "Basic example of documented entity." <|
             \() ->
                 checkExpectation (expectedComment 5 0 6 2)
-                    moduleWithDocumentedTypeAndDoc
-        , Test.test "Module with documented type 3." <|
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
+        , Test.test "Module with documented entity and top-level comment." <|
             \() ->
                 checkExpectation (expectedComment 9 0 10 2)
-                    moduleWithDocumentedTypeAndImportsAndDoc
-        , Test.test "Module with documented type 4." <|
+                    ("""
+                    module SomeName exposing (..)
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    import Models
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+                    """ |> TestUtil.dedent 20)
+        , Test.test "A more complex example." <|
             \() ->
                 checkExpectation (expectedComment 11 0 12 2)
-                    largerExample
+                    ("""
+                    module SomeName exposing (SomeType
+                                            , buildSomeType
+                                            )
+
+                    {-| This module is empty. One day, though...
+                    -}
+
+                    import Dict
+                    import List
+                    import Models
+
+                    {-| SomeType is a type.
+                    -}
+                    type alias SomeType = String
+
+                    {-| buildSomeType builds some type.
+                    -}
+                    buildSomeType = "hello"
+                    """ |> TestUtil.dedent 20)
         ]
-
-
-emptyModuleWithDoc : String
-emptyModuleWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-"""
-
-
-emptyModuleWithoutDoc : String
-emptyModuleWithoutDoc =
-    """module SomeName exposing (..)
-"""
-
-
-moduleNoImportsWithDoc : String
-moduleNoImportsWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-type alias SomeType = String
-"""
-
-
-moduleNoImportsWithoutDoc : String
-moduleNoImportsWithoutDoc =
-    """module SomeName exposing (..)
-
-type alias SomeType = String
-"""
-
-
-moduleNoDeclarationsWithDoc : String
-moduleNoDeclarationsWithDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-"""
-
-
-moduleNoDeclarationsWithoutDoc : String
-moduleNoDeclarationsWithoutDoc =
-    """module SomeName exposing (..)
-
-import Dict
-import List
-"""
-
-
-moduleWithDocumentedTypeAndNoDoc : String
-moduleWithDocumentedTypeAndNoDoc =
-    """module SomeName exposing (..)
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-moduleWithDocumentedTypeAndDoc : String
-moduleWithDocumentedTypeAndDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-moduleWithWrongTypeDocFormat1 : String
-moduleWithWrongTypeDocFormat1 =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-{- SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-moduleWithWrongTypeDocFormat2 : String
-moduleWithWrongTypeDocFormat2 =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
--- SomeType is a type.
-type alias SomeType = String
-"""
-
-
-moduleWithDocumentedTypeAndImportsAndDoc : String
-moduleWithDocumentedTypeAndImportsAndDoc =
-    """module SomeName exposing (..)
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-import Models
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-"""
-
-
-largerExample : String
-largerExample =
-    """module SomeName exposing (SomeType
-                                , buildSomeType
-                                )
-
-{-| This module is empty. One day, though...
--}
-
-import Dict
-import List
-import Models
-
-{-| SomeType is a type.
--}
-type alias SomeType = String
-
-{-| buildSomeType builds some type.
--}
-buildSomeType = "hello"
-"""

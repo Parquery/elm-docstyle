@@ -23,7 +23,12 @@ encodeIssueTest =
         [ Test.test "Trigger type top level comment." <|
             \() ->
                 Expect.equal
-                    topLevelIssueEncoded
+                    (String.join ""
+                        [ """{ violations = { 0 = "expected a top-level module comment, """
+                        , """but found none" }, trigger = { trigger_type = """
+                        , """"top-level comment", comment = "" } }"""
+                        ]
+                    )
                     (Issue.fromViolationsAndTrigger
                         [ Check.NoTopLevelComment ]
                         (Issue.TopLevel Nothing)
@@ -34,7 +39,14 @@ encodeIssueTest =
         , Test.test "Trigger type dangling comment." <|
             \() ->
                 Expect.equal
-                    danglingCommentIssueEncoded
+                    (String.join ""
+                        [ """{ violations = { 0 = "the first word of the comment"""
+                        , """ is not capitalized", 1 = "the first line of the comment """
+                        , """does not start with a space" }, trigger = { trigger_type = """
+                        , """"dangling comment", comment = { text = """
+                        , """"--some wrong dangling comment.", line = 23 } } }"""
+                        ]
+                    )
                     (Issue.fromViolationsAndTrigger
                         [ Check.NotCapitalized
                         , Check.NoStartingSpace
@@ -66,7 +78,18 @@ encodeIssueTest =
                         }
                 in
                 Expect.equal
-                    entityFunctionIssueEncoded
+                    (String.join ""
+                        [ """{ violations = { 0 = "the first line of the comment does not start """
+                        , """with a verb in third person (stem -s)", 1 = "the comment """
+                        , """contains one of the words (todo, fixme)" }, """
+                        , """trigger = { trigger_type = "entity", entity = """
+                        , """{ range = { 0 = 20, 1 = 0, 2 = 25, 3 = 0 }, """
+                        , """type = "function with parameters (aString)", """
+                        , """name = "someFunction", comment = { text = """
+                        , """"{-| A function. Fixme: write a description. -}", """
+                        , """line = 20 }, exposed = True } } }"""
+                        ]
+                    )
                     (Issue.fromViolationsAndTrigger
                         [ Check.NoStartingVerb
                         , Check.TodoComment
@@ -88,7 +111,14 @@ encodeIssueTest =
                         }
                 in
                 Expect.equal
-                    entityTypeAliasIssueEncoded
+                    (String.join ""
+                        [ """{ violations = { 0 = "expected a comment on top of the """
+                        , """declaration, but found none" }, trigger = { trigger_type """
+                        , """= "entity", entity = { range = { 0 = 20, 1 = 0, 2 = 25, """
+                        , """3 = 0 }, type = "type alias", name = "StringAlias", """
+                        , """comment = "", exposed = True } } }"""
+                        ]
+                    )
                     (Issue.fromViolationsAndTrigger
                         [ Check.NoEntityComment
                         ]
@@ -97,50 +127,4 @@ encodeIssueTest =
                         |> Maybe.map toString
                         |> Maybe.withDefault ""
                     )
-        ]
-
-
-topLevelIssueEncoded : String
-topLevelIssueEncoded =
-    String.join ""
-        [ """{ violations = { 0 = "expected a top-level module comment, """
-        , """but found none" }, trigger = { trigger_type = """
-        , """"top-level comment", comment = "" } }"""
-        ]
-
-
-danglingCommentIssueEncoded : String
-danglingCommentIssueEncoded =
-    String.join ""
-        [ """{ violations = { 0 = "in one line of the comment, the first """
-        , """word is not capitalized", 1 = "the first line of the comment """
-        , """does not start with a space" }, trigger = { trigger_type = """
-        , """"dangling comment", comment = { text = """
-        , """"--some wrong dangling comment.", line = 23 } } }"""
-        ]
-
-
-entityFunctionIssueEncoded : String
-entityFunctionIssueEncoded =
-    String.join ""
-        [ """{ violations = { 0 = "one line of the comment does not start """
-        , """with a verb in third person (stem -s)", 1 = "the comment """
-        , """contains one of the words (todo, fixme)" }, """
-        , """trigger = { trigger_type = "entity", entity = """
-        , """{ range = { 0 = 20, 1 = 0, 2 = 25, 3 = 0 }, """
-        , """type = "function with parameters (aString)", """
-        , """name = "someFunction", comment = { text = """
-        , """"{-| A function. Fixme: write a description. -}", """
-        , """line = 20 }, exposed = True } } }"""
-        ]
-
-
-entityTypeAliasIssueEncoded : String
-entityTypeAliasIssueEncoded =
-    String.join ""
-        [ """{ violations = { 0 = "expected a comment on top of the """
-        , """declaration, but found none" }, trigger = { trigger_type """
-        , """= "entity", entity = { range = { 0 = 20, 1 = 0, 2 = 25, """
-        , """3 = 0 }, type = "type alias", name = "StringAlias", """
-        , """comment = "", exposed = True } } }"""
         ]

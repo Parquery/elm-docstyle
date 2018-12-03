@@ -15,44 +15,50 @@ import Models
 
 
 {-| Translates a module parsed by elm-syntax to a custom representation.
+
+  - ´moduleDefinition´ -- contains the name and type of the parse module.
+  - ´imports´ -- the list of imports.
+  - ´declarations´ -- the list of type and function declarations, along
+    with their corresponding documentation comment (if it exists).
+  - ´comments´ -- all the comments in the module that do not belong to a declaration.
+
 -}
 translate : Elm.Syntax.File.File -> Models.ParsedModule
-translate file =
+translate ({ moduleDefinition, imports, declarations, comments } as file) =
     let
         moduleName =
-            file.moduleDefinition
+            moduleDefinition
                 |> Elm.Syntax.Module.moduleName
                 |> Maybe.map (String.join ".")
                 |> Maybe.withDefault "Unknown module name"
 
-        comments =
-            file.comments
-                |> List.sortBy (\( range, _ ) -> range.start.row)
+        sortedComments =
+            List.sortBy (\( range, _ ) -> range.start.row) comments
 
         topLevelComment =
             getTopLevelComment file
 
         entities =
-            file.declarations
+            declarations
                 |> List.sortBy (\( range, _ ) -> range.start.row)
                 |> List.map
                     (\dec ->
                         declarationToEntity
                             dec
-                            (isExposed file.moduleDefinition)
+                            (isExposed moduleDefinition)
                     )
                 |> List.filterMap identity
                 |> List.map
                     (\ent ->
                         if ent.eType == Models.TypeDef then
-                            getCommentForType ent comments
+                            getCommentForType ent sortedComments
 
                         else
                             ent
                     )
 
         otherComments =
-            comments
+            sortedComments
                 |> (\list ->
                         (Maybe.map (\_ -> List.drop 1 list) topLevelComment
                             |> Maybe.withDefault list
@@ -74,6 +80,8 @@ translate file =
     }
 
 
+{-| Determines whether a declaration is exposed by the module.
+-}
 isExposed : Elm.Syntax.Module.Module -> String -> Bool
 isExposed mod entityName =
     case Elm.Syntax.Module.exposingList mod of
@@ -100,11 +108,17 @@ isExposed mod entityName =
                     )
 
 
+{-| Translates a declaration parsed by the Elm.Syntax library to the intermediate representation.
+
+  - ´exposedFn´ -- partially applied function which determines whether a
+    declaration name is exposed by the module.
+
+-}
 declarationToEntity :
     Ranged Declaration
     -> (String -> Bool)
     -> Maybe Models.Entity
-declarationToEntity ( range, declaration ) exp =
+declarationToEntity ( range, declaration ) exposedFn =
     let
         entity =
             { range = range
@@ -137,7 +151,7 @@ declarationToEntity ( range, declaration ) exp =
                 { entity
                     | name = nm
                     , eType = tp
-                    , exposed = exp nm
+                    , exposed = exposedFn nm
                     , comment = comment
                 }
 
@@ -163,7 +177,7 @@ declarationToEntity ( range, declaration ) exp =
                         { entity
                             | name = nm
                             , eType = tp
-                            , exposed = exp nm
+                            , exposed = exposedFn nm
                             , comment = comment
                         }
 
@@ -179,7 +193,7 @@ declarationToEntity ( range, declaration ) exp =
                         { entity
                             | name = nm
                             , eType = tp
-                            , exposed = exp nm
+                            , exposed = exposedFn nm
                             , comment = comment
                         }
 
@@ -195,13 +209,15 @@ declarationToEntity ( range, declaration ) exp =
                 { entity
                     | name = nm
                     , eType = tp
-                    , exposed = exp nm
+                    , exposed = exposedFn nm
                 }
 
         _ ->
             Nothing
 
 
+{-| Deduces all variable names by exploring the variable list recursively.
+-}
 getVarNamesFromPattern : Pattern -> List String
 getVarNamesFromPattern pattern =
     let
@@ -248,7 +264,7 @@ getVarNamesFromPattern pattern =
         |> List.filter (\s -> s /= "_")
 
 
-{-| Deduce the top-level comment, if there's one.
+{-| Deduces the top-level comment, if there's one.
 -}
 getTopLevelComment : Elm.Syntax.File.File -> Maybe Models.Comment
 getTopLevelComment file =
@@ -300,6 +316,12 @@ getTopLevelComment file =
             )
 
 
+{-| Assigns a documentation level to Union Types.
+
+This step is necessary since the Elm.Syntax parser doesn't assign documentation
+comments to union types.
+
+-}
 getCommentForType : Models.Entity -> List Models.Comment -> Models.Entity
 getCommentForType entity comments =
     let

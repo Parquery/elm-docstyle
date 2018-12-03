@@ -1,18 +1,18 @@
 module Configuration exposing (Format(..), Model, defaultModel, fromFlags)
 
-{-| Contains the configuration for customizing elm-docstyle's behavior.
+{-| Provides the configuration for customizing elm-docstyle's behavior.
 -}
 
 import Check
 import Models
 
 
-{-| Creates a configuration record from the flags passed to elm-docsytle.
+{-| Creates a configuration record from the flags passed to elm-docstyle.
 
-  - `verbose` -- if set, the violations will include the offending comment
-  - `format` -- human or JSON format for the checks
-  - `excludedChecks` -- an optional list of constraints to ignore
-  - `checkAllDefinitions` -- if set, all declarations are checked;
+  - ´verbose´ -- if set, the violations will include the offending comment
+  - ´format´ -- human or JSON format for the checks
+  - ´excludedChecks´ -- an optional list of constraints to ignore
+  - ´checkAllDefinitions´ -- if set, all declarations are checked;
     otherwise, only exported ones.
 
 -}
@@ -81,11 +81,11 @@ fromFlags { verbose, format, excludedChecks, checkAllDefinitions } =
 
 {-| Is the configuration model.
 
-  - `excludedChecks` -- an optional list of constraints to ignore
-  - `checkAllDefinitions` -- if set, all declarations are checked;
+  - ´excludedChecks´ -- an optional list of constraints to ignore
+  - ´checkAllDefinitions´ -- if set, all declarations are checked;
     otherwise, only exported ones.
-  - `verbose` -- if set, the violations will include the offending comment
-  - `format` -- human or JSON format for the checks
+  - ´verbose´ -- if set, the violations will include the offending comment
+  - ´format´ -- human or JSON format for the checks
 
 -}
 type alias Model =
@@ -107,6 +107,8 @@ defaultModel =
     }
 
 
+{-| Specifies the default output format as human (string).
+-}
 defaultFormat : Format
 defaultFormat =
     HUMAN

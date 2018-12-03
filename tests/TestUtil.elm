@@ -1,6 +1,6 @@
-module TestUtil exposing (range, stringToIntermediate)
+module TestUtil exposing (dedent, range, stringToIntermediate)
 
-{-| Contains utility functions for the test suite.
+{-| Provides utility functions for the test suite.
 -}
 
 import Elm.Parser
@@ -10,7 +10,7 @@ import Intermediate
 import Models
 
 
-{-| Parses a string to a ParsedModule.
+{-| Parses a valid Elm source code given as a string to a ParsedModule.
 -}
 stringToIntermediate : String -> Maybe Models.ParsedModule
 stringToIntermediate str =
@@ -23,6 +23,25 @@ stringToIntermediate str =
 
         Err e ->
             Nothing
+
+
+{-| Removes indentation from a multi-line string.
+-}
+dedent : Int -> String -> String
+dedent prefix str =
+    str
+        |> String.lines
+        |> List.indexedMap
+            (\idx ->
+                \line ->
+                    if idx == 0 then
+                        line
+
+                    else
+                        String.dropLeft prefix line
+            )
+        |> String.join "\n"
+        |> String.trimLeft
 
 
 {-| Creates a range from the two given (row, column) tuples.
