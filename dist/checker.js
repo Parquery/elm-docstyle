@@ -3258,8 +3258,12 @@ var _Parquery$elm_docstyle$Check$startingCapitalized = function (comment) {
 	var first = A2(
 		_elm_lang$core$Maybe$withDefault,
 		'A',
-		_elm_lang$core$List$head(
-			_elm_lang$core$String$words(comment)));
+		A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$String$left(1),
+			_elm_lang$core$List$head(
+				_elm_lang$core$String$words(
+					_Parquery$elm_docstyle$Check$commentText(comment)))));
 	return _elm_lang$core$Native_Utils.eq(
 		_elm_lang$core$String$toUpper(first),
 		first) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_Parquery$elm_docstyle$Check$NotCapitalized);

@@ -10,8 +10,11 @@ startingCapitalized : String -> Maybe Type
 startingCapitalized comment =
     let
         first =
-            String.words comment
+            comment
+                |> commentText
+                |> String.words
                 |> List.head
+                |> Maybe.map (String.left 1)
                 -- if no words, no violation of the rule.
                 |> Maybe.withDefault "A"
     in
