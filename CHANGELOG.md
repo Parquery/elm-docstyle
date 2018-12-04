@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Changed README and CHANGELOG file formats from rst to md
+
 ## 0.1.1
 
 - Added compiled Elm to the library
