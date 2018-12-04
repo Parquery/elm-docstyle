@@ -1,3 +1,6 @@
+## 1.0.0
+- Tested the tool on real-world Elm codebase
+
 ## 0.1.2
 
 - Changed README and CHANGELOG file formats from rst to md

@@ -1,6 +1,6 @@
 {
   "name": "elm-docstyle",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "A tool that allows you to check the quality fo your Elm code documentation.",
   "main": "dist/index.js",
   "directories": {
