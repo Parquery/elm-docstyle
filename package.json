@@ -1,6 +1,6 @@
 {
   "name": "elm-docstyle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A tool that allows you to check the quality fo your Elm code documentation.",
   "main": "dist/index.js",
   "directories": {
@@ -10,8 +10,9 @@
     "elm-docstyle": "./dist/index.js"
   },
   "scripts": {
-    "run": "node dist/bin/index.js",
-    "prepare": "npm run build && npm run format && npm run analyse && npm run docstyle && npm run test",
+    "run": "node dist/index.js",
+    "prepublishOnly": "npm run docstyle",
+    "prepare": "npm run build && npm run format && npm run analyse && npm run test",
     "build": "elm-make src/Main.elm  --output dist/checker.js",
     "format": "elm-format --elm-version=0.18 src/ tests/ --yes ",
     "analyse": "elm-analyse && elm-analyse tests/",
@@ -31,7 +32,7 @@
     "quality"
   ],
   "author": "Teodoro Filippini <teodoro.filippini@gmail.com>",
-  "constributors" : [
+  "constributors": [
     "Teodoro Filippini <teodoro.filippini@gmail.com>",
     "Marko Ristin <marko.ristin@gmail.com>"
   ],
