@@ -107,7 +107,7 @@ defaultModel =
     }
 
 
-{-| Specifies the default output format as human (string).
+{-| Specifies the default output format as human-readable string.
 -}
 defaultFormat : Format
 defaultFormat =

@@ -46,7 +46,7 @@ checkEntityCommentTest =
                     value : Int -> String
                     value anInt =
                         toString anInt
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with no comment on exposed record." <|
@@ -63,7 +63,7 @@ checkEntityCommentTest =
                          { aField : String
                          , anotherField : Int
                          }
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with wrong argument comment on exposed record." <|
@@ -84,7 +84,7 @@ checkEntityCommentTest =
                         { aField : String
                         , anotherField : Int
                         }
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with no comment on exposed type def." <|
@@ -95,7 +95,7 @@ checkEntityCommentTest =
                     module SomeName exposing (..)
 
                     type Something = A | B
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with no comment on exposed type alias." <|
@@ -106,7 +106,7 @@ checkEntityCommentTest =
                     module SomeName exposing (..)
 
                     type alias Something = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     False
         , Test.describe
@@ -137,7 +137,7 @@ checkEntityCommentTest =
                     value : Int -> String
                     value anInt =
                       toString anInt
-                    """ |> TestUtil.dedent 20
+                    """ |> TestUtil.dedent
                 , """
                     module SomeName exposing (Param)
 
@@ -149,7 +149,7 @@ checkEntityCommentTest =
                        { aField : String
                        , anotherField : Int
                        }
-                    """ |> TestUtil.dedent 20
+                    """ |> TestUtil.dedent
                 , """
                     module SomeName exposing (Param)
 
@@ -158,7 +158,7 @@ checkEntityCommentTest =
                     type alias Param = String
 
                     type Something = A | B
-                    """ |> TestUtil.dedent 20
+                    """ |> TestUtil.dedent
                 , """
                     module SomeName exposing (Param)
 
@@ -167,7 +167,7 @@ checkEntityCommentTest =
                     type alias Param = String
 
                     type alias Something = String
-                    """ |> TestUtil.dedent 20
+                    """ |> TestUtil.dedent
                 ]
             )
         , Test.test
@@ -188,7 +188,7 @@ checkEntityCommentTest =
                     value : Int -> String
                     value anInt =
                         toString anInt
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test
@@ -211,7 +211,7 @@ checkEntityCommentTest =
                          { aField : String
                          , anotherField : Int
                          }
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test
@@ -224,7 +224,7 @@ checkEntityCommentTest =
                     module SomeName exposing (..)
 
                     type Something = A | B
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test
@@ -237,7 +237,7 @@ checkEntityCommentTest =
                     module SomeName exposing (..)
 
                     type alias Something = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with comment violating numerous checks." <|
@@ -257,7 +257,7 @@ checkEntityCommentTest =
                     value : Int -> String
                     value anInt =
                         toString anInt
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with comment violating numerous checks 2." <|
@@ -285,7 +285,7 @@ checkEntityCommentTest =
                     value : Int -> Int -> Int -> String
                     value anInt anotherInt aThirdInt =
                         toString anInt
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with comment violating numerous checks, all ignored." <|
@@ -305,7 +305,7 @@ checkEntityCommentTest =
                     value : Int -> Int -> Int -> String
                     value anInt anotherInt aThirdInt =
                         toString anInt
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     [ Check.NotAnnotatedArgument ""
                     , Check.TodoComment
                     , Check.NotCapitalized
@@ -330,7 +330,7 @@ checkEntityCommentTest =
                         { aField : String
                         , anotherField : Int
                         }
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         , Test.test "Module with correctly documented function." <|
@@ -348,7 +348,7 @@ checkEntityCommentTest =
                     value : Int -> String
                     value anInt =
                         toString anInt
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
                     []
                     True
         ]

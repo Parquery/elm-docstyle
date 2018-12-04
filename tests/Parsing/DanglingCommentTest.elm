@@ -50,7 +50,7 @@ parseDanglingCommentTest =
                             ("no dangling comments " ++ toString idx)
                             (\() ->
                                 moduleStr
-                                    |> TestUtil.dedent 18
+                                    |> TestUtil.dedent
                                     |> checkNoDanglingComments
                             )
                 )
@@ -122,7 +122,7 @@ parseDanglingCommentTest =
                     -}
                     buildSomeType = "hello"
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
         , Test.test "Module with top-level comment in the wrong format --, parsed as dangling." <|
             \() ->
@@ -152,7 +152,7 @@ parseDanglingCommentTest =
                     -}
                     buildSomeType = "hello"
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
         , Test.test "Basic dangling comment wrapped in --." <|
             \() ->
@@ -185,7 +185,7 @@ parseDanglingCommentTest =
                     -}
                     buildSomeType = "hello"
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
         , Test.test "Basic dangling comment wrapped in {--}." <|
             \() ->
@@ -218,7 +218,7 @@ parseDanglingCommentTest =
                     -}
                     buildSomeType = "hello"
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
         , Test.test "Dangling documentation comment {-|-}." <|
             \() ->
@@ -251,6 +251,6 @@ parseDanglingCommentTest =
                     -}
                     buildSomeType = "hello"
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
         ]

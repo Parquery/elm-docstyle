@@ -55,7 +55,7 @@ parseEntityCommentTest =
 
                   {-| This module is empty. One day, though...
                   -}
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 , """module SomeName exposing (..)"""
                 , """
                   module SomeName exposing (..)
@@ -65,13 +65,13 @@ parseEntityCommentTest =
 
                   import Dict
                   import List
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 , """
                   module SomeName exposing (..)
 
                   import Dict
                   import List
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 ]
             )
         , Test.describe "Modules with declarations and no comment."
@@ -89,12 +89,12 @@ parseEntityCommentTest =
                   -}
 
                   type alias SomeType = String
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 , """
                   module SomeName exposing (..)
 
                   type alias SomeType = String
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 ]
             )
         , Test.describe
@@ -115,7 +115,7 @@ parseEntityCommentTest =
                   {- SomeType is a type.
                   -}
                   type alias SomeType = String
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 , """
                   module SomeName exposing (..)
 
@@ -124,7 +124,7 @@ parseEntityCommentTest =
 
                   -- SomeType is a type.
                   type alias SomeType = String
-                  """ |> TestUtil.dedent 18
+                  """ |> TestUtil.dedent
                 ]
             )
         , Test.test "Basic example of documented entity." <|
@@ -139,7 +139,7 @@ parseEntityCommentTest =
                     {-| SomeType is a type.
                     -}
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module with documented entity and top-level comment." <|
             \() ->
                 checkExpectation (expectedComment 9 0 10 2)
@@ -156,7 +156,7 @@ parseEntityCommentTest =
                     {-| SomeType is a type.
                     -}
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "A more complex example." <|
             \() ->
                 checkExpectation (expectedComment 11 0 12 2)
@@ -179,5 +179,5 @@ parseEntityCommentTest =
                     {-| buildSomeType builds some type.
                     -}
                     buildSomeType = "hello"
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         ]

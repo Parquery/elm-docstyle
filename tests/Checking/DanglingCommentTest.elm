@@ -40,7 +40,7 @@ checkDanglingCommentTest =
 
                     {- A dangling comment.-}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Ok dangling comment wrapped in --." <|
@@ -51,7 +51,7 @@ checkDanglingCommentTest =
 
                     -- A dangling comment.
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Empty dangling comment wrapped in {--}." <|
@@ -65,7 +65,7 @@ checkDanglingCommentTest =
 
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Empty dangling comment wrapped in --." <|
@@ -77,7 +77,7 @@ checkDanglingCommentTest =
 
                     --
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Wrong dangling comment type (documentation comment)." <|
@@ -95,7 +95,7 @@ checkDanglingCommentTest =
                     {-| This is a well-formed but ill-placed dangling comment.
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Larger example: comment violating numerous checks." <|
@@ -116,7 +116,7 @@ checkDanglingCommentTest =
 
                     --this is a poorly-formed dangling comment. fixme: make it better
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Larger example, ignoring all violated checks." <|
@@ -133,7 +133,7 @@ checkDanglingCommentTest =
 
                     --this is a poorly-formed dangling comment. fixme: make it better
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     [ Check.NotCapitalized
                     , Check.NoStartingSpace

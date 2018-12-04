@@ -22,7 +22,7 @@ startingCapitalized comment =
         Just NotCapitalized
 
 
-{-| Checks whether the comment's delimiter is followed a space.
+{-| Checks whether the comment's delimiter is followed by a space.
 -}
 startingSpace : String -> Maybe Type
 startingSpace comment =

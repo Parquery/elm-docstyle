@@ -90,5 +90,5 @@ parseTest =
                     {-| buildSomeType builds some type.
                     -}
                     buildSomeType = "hello"
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         ]

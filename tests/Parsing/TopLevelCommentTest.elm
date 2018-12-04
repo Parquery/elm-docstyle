@@ -37,7 +37,7 @@ parseTopLevelCommentTest =
 
                     {-| This module is empty. One day, though...
                     -}
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Empty module without doc." <|
             \() ->
                 checkExpectation Nothing
@@ -52,7 +52,7 @@ parseTopLevelCommentTest =
                     -}
 
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module without doc and no imports." <|
             \() ->
                 checkExpectation Nothing
@@ -60,7 +60,7 @@ parseTopLevelCommentTest =
                     module SomeName exposing (..)
 
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module with doc and no declarations." <|
             \() ->
                 checkExpectation expectedDocs
@@ -72,7 +72,7 @@ parseTopLevelCommentTest =
 
                     import Dict
                     import List
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module without doc and no declarations." <|
             \() ->
                 checkExpectation Nothing
@@ -81,7 +81,7 @@ parseTopLevelCommentTest =
 
                     import Dict
                     import List
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module with doc and commented declaration." <|
             \() ->
                 checkExpectation expectedDocs
@@ -94,7 +94,7 @@ parseTopLevelCommentTest =
                     {-| SomeType is a type.
                     -}
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module without doc and commented declaration." <|
             \() ->
                 checkExpectation Nothing
@@ -104,7 +104,7 @@ parseTopLevelCommentTest =
                     {-| SomeType is a type.
                     -}
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Module with doc and imports and commented declaration." <|
             \() ->
                 checkExpectation expectedDocs
@@ -121,7 +121,7 @@ parseTopLevelCommentTest =
                     {-| SomeType is a type.
                     -}
                     type alias SomeType = String
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Larger example." <|
             \() ->
                 checkExpectation
@@ -149,7 +149,7 @@ parseTopLevelCommentTest =
                     {-| buildSomeType builds some type.
                     -}
                     buildSomeType = "hello"
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Doc with wrong comment type {--}." <|
             \() ->
                 checkExpectation Nothing
@@ -172,7 +172,7 @@ parseTopLevelCommentTest =
                     {-| buildSomeType builds some type.
                     -}
                     buildSomeType = "hello"
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         , Test.test "Doc with wrong comment type --." <|
             \() ->
                 checkExpectation Nothing
@@ -194,5 +194,5 @@ parseTopLevelCommentTest =
                     {-| buildSomeType builds some type.
                     -}
                     buildSomeType = "hello"
-                    """ |> TestUtil.dedent 20)
+                    """ |> TestUtil.dedent)
         ]

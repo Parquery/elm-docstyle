@@ -53,7 +53,7 @@ checkTopLevelCommentTest =
                     {-| This module is empty. todo: change it.
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "f.i.x.m.e in documentation." <|
@@ -66,7 +66,7 @@ checkTopLevelCommentTest =
                     {-| This module is empty. fixme: change it.
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "no starting space in documentation." <|
@@ -79,7 +79,7 @@ checkTopLevelCommentTest =
                     {-|This module is empty.
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "empty top level comment." <|
@@ -92,7 +92,7 @@ checkTopLevelCommentTest =
                     {-|
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "Correct documentation comment." <|
@@ -105,7 +105,7 @@ checkTopLevelCommentTest =
                     {-| This module is empty. One day, though...
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "No starting space and f.i.x.m.e in comment." <|
@@ -118,7 +118,7 @@ checkTopLevelCommentTest =
                     {-|This module is empty. fixme: change it.
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     []
         , Test.test "No starting space and f.i.x.m.e in comment, both ignored." <|
@@ -131,7 +131,7 @@ checkTopLevelCommentTest =
                     {-|This module is empty. fixme: change it.
                     -}
                     """
-                        |> TestUtil.dedent 20
+                        |> TestUtil.dedent
                     )
                     [ Check.NoStartingSpace, Check.TodoComment ]
         ]

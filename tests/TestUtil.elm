@@ -26,9 +26,25 @@ stringToIntermediate str =
 
 
 {-| Removes indentation from a multi-line string.
+
+It uses the first nonempty line of the string as reference.
+
 -}
-dedent : Int -> String -> String
-dedent prefix str =
+dedent : String -> String
+dedent str =
+    let
+        prefix =
+            str
+                |> String.lines
+                -- remove the first newline of the string, which is empty.
+                |> List.drop 1
+                |> List.head
+                |> Maybe.withDefault ""
+                |> (\firstLine ->
+                        String.length firstLine
+                            - String.length (String.trimLeft firstLine)
+                   )
+    in
     str
         |> String.lines
         |> List.indexedMap
