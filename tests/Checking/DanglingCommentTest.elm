@@ -140,4 +140,24 @@ checkDanglingCommentTest =
                     , Check.NoEndingPeriod
                     , Check.TodoComment
                     ]
+        , Test.test "Another larger example." <|
+            \() ->
+                checkExpectation
+                    [ Check.NotCapitalized
+                    , Check.TodoComment
+                    ]
+                    ("""
+                    module SomeName exposing (..)
+
+                    import String
+
+
+                    type alias Tp = Int
+
+                    {- this is a poorly-formed dangling comment. todo: improve it.
+                    -}
+                    """
+                        |> TestUtil.dedent
+                    )
+                    []
         ]
