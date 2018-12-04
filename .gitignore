@@ -8,4 +8,3 @@ ts-out
 js/
 .idea
 tests/elm-stuff
-dist/checker.js
