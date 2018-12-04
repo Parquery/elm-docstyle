@@ -35,14 +35,14 @@ const args = minimist(process.argv.slice(2), {
         process.exit(1);
     }
 
-    if (args._.length === 0) {
-        console.log("Please specify at least one directory or path to Elm source file.\n" + helpStr);
-        process.exit(1);
-    }
-
     if (args.version) {
         console.log(elmDocstyleVersion);
         process.exit(0);
+    }
+
+    if (args._.length === 0) {
+        console.log("Please specify at least one directory or path to Elm source file.\n" + helpStr);
+        process.exit(1);
     }
 
     const validFormats = ['json', 'human'];
