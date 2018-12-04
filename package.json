@@ -1,7 +1,7 @@
 {
   "name": "elm-docstyle",
   "version": "1.0.0",
-  "description": "A tool that allows you to check the quality fo your Elm code documentation.",
+  "description": "A tool that allows you to check the quality of your Elm code documentation.",
   "main": "dist/index.js",
   "directories": {
     "test": "tests"
@@ -32,7 +32,7 @@
     "quality"
   ],
   "author": "Teodoro Filippini <teodoro.filippini@gmail.com>",
-  "constributors": [
+  "contributors": [
     "Teodoro Filippini <teodoro.filippini@gmail.com>",
     "Marko Ristin <marko.ristin@gmail.com>"
   ],
