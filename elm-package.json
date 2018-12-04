@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "stil4m/elm-syntax": "5.0.1 <= v <= 5.0.1",
+    "elm-lang/core": "5.1.1 <= v <= 5.1.1"
+  },
+  "elm-version": "0.18.0 <= v < 0.19.0",
+  "exposed-modules": [],
+  "license": "Copyright (C) Parquery AG - All Rights Reserved. Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential. Written by Dominik Walder, 2018",
+  "repository": "https://github.com/Parquery/elm-docstyle.git",
+  "source-directories": [
+    "src"
+  ],
+  "summary": "Docs style checker for Elm projects",
+  "version": "1.0.0"
+}

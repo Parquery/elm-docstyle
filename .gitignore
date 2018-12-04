@@ -1,4 +1,11 @@
-# elm-package generated files
 elm-stuff
-# elm-repl generated files
-repl-temp-*
+npm-debug.log
+elm.js
+tmp
+node_modules
+/cache
+ts-out
+js/
+.idea
+tests/elm-stuff
+dist/checker.js
